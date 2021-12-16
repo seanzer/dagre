@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("../chai").expect;
 var Graph = require("../../lib/graphlib").Graph;
 var feasibleTree = require("../../lib/rank/feasible-tree");
 
@@ -11,8 +10,8 @@ describe("feasibleTree", function() {
       .setEdge("a", "b", { minlen: 1 });
 
     var tree = feasibleTree(g);
-    expect(g.node("b").rank).to.equal(g.node("a").rank + 1);
-    expect(tree.neighbors("a")).to.eql(["b"]);
+    expect(g.node("b").rank).toEqual(g.node("a").rank + 1);
+    expect(tree.neighbors("a")).toEqual(["b"]);
   });
 
   it("correctly shortens slack by pulling a node up", function() {
@@ -25,13 +24,13 @@ describe("feasibleTree", function() {
       .setEdge("a", "d", { minlen: 1 });
 
     var tree = feasibleTree(g);
-    expect(g.node("b").rank).to.eql(g.node("a").rank + 1);
-    expect(g.node("c").rank).to.eql(g.node("b").rank + 1);
-    expect(g.node("d").rank).to.eql(g.node("a").rank + 1);
-    expect(_.sortBy(tree.neighbors("a"))).to.eql(["b", "d"]);
-    expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
-    expect(tree.neighbors("c")).to.eql(["b"]);
-    expect(tree.neighbors("d")).to.eql(["a"]);
+    expect(g.node("b").rank).toEqual(g.node("a").rank + 1);
+    expect(g.node("c").rank).toEqual(g.node("b").rank + 1);
+    expect(g.node("d").rank).toEqual(g.node("a").rank + 1);
+    expect(_.sortBy(tree.neighbors("a"))).toEqual(["b", "d"]);
+    expect(_.sortBy(tree.neighbors("b"))).toEqual(["a", "c"]);
+    expect(tree.neighbors("c")).toEqual(["b"]);
+    expect(tree.neighbors("d")).toEqual(["a"]);
   });
 
   it("correctly shortens slack by pulling a node down", function() {
@@ -43,10 +42,10 @@ describe("feasibleTree", function() {
       .setEdge("b", "c", { minlen: 1 });
 
     var tree = feasibleTree(g);
-    expect(g.node("a").rank).to.eql(g.node("b").rank + 1);
-    expect(g.node("c").rank).to.eql(g.node("b").rank + 1);
-    expect(_.sortBy(tree.neighbors("a"))).to.eql(["b"]);
-    expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
-    expect(_.sortBy(tree.neighbors("c"))).to.eql(["b"]);
+    expect(g.node("a").rank).toEqual(g.node("b").rank + 1);
+    expect(g.node("c").rank).toEqual(g.node("b").rank + 1);
+    expect(_.sortBy(tree.neighbors("a"))).toEqual(["b"]);
+    expect(_.sortBy(tree.neighbors("b"))).toEqual(["a", "c"]);
+    expect(_.sortBy(tree.neighbors("c"))).toEqual(["b"]);
   });
 });

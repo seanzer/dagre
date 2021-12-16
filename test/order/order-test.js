@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("../chai").expect;
 var Graph = require("../../lib/graphlib").Graph;
 var order = require("../../lib/order");
 var crossCount = require("../../lib/order/cross-count");
@@ -22,17 +21,17 @@ describe("order", function() {
     g.setPath(["a", "e", "f"]);
     order(g);
     var layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.equal(0);
+    expect(crossCount(g, layering)).toEqual(0);
   });
 
   it("can solve a simple graph", function() {
-    // This graph resulted in a single crossing for previous versions of dagre.
+    // This graph resutoBeLessThanOrEquald in a single crossing for previous versions of dagre.
     _.forEach(["a", "d"], function(v) { g.setNode(v, { rank: 1 }); });
     _.forEach(["b", "f", "e"], function(v) { g.setNode(v, { rank: 2 }); });
     _.forEach(["c", "g"], function(v) { g.setNode(v, { rank: 3 }); });
     order(g);
     var layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.equal(0);
+    expect(crossCount(g, layering)).toEqual(0);
   });
 
   it("can minimize crossings", function() {
@@ -42,6 +41,6 @@ describe("order", function() {
     g.setNode("d", { rank: 4 });
     order(g);
     var layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.be.lte(1);
+    expect(crossCount(g, layering)).toBeLessThanOrEqual(1);
   });
 });

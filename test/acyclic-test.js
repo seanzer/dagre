@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("./chai").expect;
 var acyclic = require("../lib/acyclic");
 var Graph = require("../lib/graphlib").Graph;
 var findCycles = require("../lib/graphlib").alg.findCycles;
@@ -29,7 +28,7 @@ describe("acyclic", function() {
           g.setPath(["a", "c", "d"]);
           acyclic.run(g);
           var results = _.map(g.edges(), stripLabel);
-          expect(_.sortBy(results, ["v", "w"])).to.eql([
+          expect(_.sortBy(results, ["v", "w"])).toEqual([
             { v: "a", w: "b" },
             { v: "a", w: "c" },
             { v: "b", w: "d" },
@@ -40,19 +39,19 @@ describe("acyclic", function() {
         it("breaks cycles in the input graph", function() {
           g.setPath(["a", "b", "c", "d", "a"]);
           acyclic.run(g);
-          expect(findCycles(g)).to.eql([]);
+          expect(findCycles(g)).toEqual([]);
         });
 
         it("creates a multi-edge where necessary", function() {
           g.setPath(["a", "b", "a"]);
           acyclic.run(g);
-          expect(findCycles(g)).to.eql([]);
+          expect(findCycles(g)).toEqual([]);
           if (g.hasEdge("a", "b")) {
-            expect(g.outEdges("a", "b")).to.have.length(2);
+            expect(g.outEdges("a", "b")).toHaveSize(2);
           } else {
-            expect(g.outEdges("b", "a")).to.have.length(2);
+            expect(g.outEdges("b", "a")).toHaveSize(2);
           }
-          expect(g.edgeCount()).to.equal(2);
+          expect(g.edgeCount()).toEqual(2);
         });
       });
 
@@ -61,8 +60,8 @@ describe("acyclic", function() {
           g.setEdge("a", "b", { minlen: 2, weight: 3 });
           acyclic.run(g);
           acyclic.undo(g);
-          expect(g.edge("a", "b")).to.eql({ minlen: 2, weight: 3 });
-          expect(g.edges()).to.have.length(1);
+          expect(g.edge("a", "b")).toEqual({ minlen: 2, weight: 3 });
+          expect(g.edges()).toHaveSize(1);
         });
 
         it("can restore previosuly reversed edges", function() {
@@ -70,9 +69,9 @@ describe("acyclic", function() {
           g.setEdge("b", "a", { minlen: 3, weight: 4 });
           acyclic.run(g);
           acyclic.undo(g);
-          expect(g.edge("a", "b")).to.eql({ minlen: 2, weight: 3 });
-          expect(g.edge("b", "a")).to.eql({ minlen: 3, weight: 4 });
-          expect(g.edges()).to.have.length(2);
+          expect(g.edge("a", "b")).toEqual({ minlen: 2, weight: 3 });
+          expect(g.edge("b", "a")).toEqual({ minlen: 3, weight: 4 });
+          expect(g.edges()).toHaveSize(2);
         });
       });
     });
@@ -85,8 +84,8 @@ describe("acyclic", function() {
       g.setPath(["a", "b", "c", "d", "a"]);
       g.setEdge("c", "d", { weight: 1 });
       acyclic.run(g);
-      expect(findCycles(g)).to.eql([]);
-      expect(g.hasEdge("c", "d")).to.be.false;
+      expect(findCycles(g)).toEqual([]);
+      expect(g.hasEdge("c", "d")).toBeFalse;
     });
   });
 });

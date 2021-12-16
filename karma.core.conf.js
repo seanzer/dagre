@@ -17,9 +17,8 @@ module.exports = function(config) {
     files: [
       'node_modules/lodash/lodash.js',
       'node_modules/graphlib/dist/graphlib.core.js',
-      'build/dagre.core.js',
+      'dist/dagre.core.js',
 
-      'node_modules/chai/chai.js',
       'test/bundle-test.js'
     ],
 

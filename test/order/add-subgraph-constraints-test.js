@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("../chai").expect;
 var Graph = require("../../lib/graphlib").Graph;
 var addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
 
@@ -15,8 +14,8 @@ describe("order/addSubgraphConstraints", function() {
     var vs = ["a", "b", "c", "d"];
     _.forEach(vs, function(v) { g.setNode(v); });
     addSubgraphConstraints(g, cg, vs);
-    expect(cg.nodeCount()).equals(0);
-    expect(cg.edgeCount()).equals(0);
+    expect(cg.nodeCount()).toEqual(0);
+    expect(cg.edgeCount()).toEqual(0);
   });
 
   it("doesn't create a constraint for contiguous subgraph nodes", function() {
@@ -25,8 +24,8 @@ describe("order/addSubgraphConstraints", function() {
       g.setParent(v, "sg");
     });
     addSubgraphConstraints(g, cg, vs);
-    expect(cg.nodeCount()).equals(0);
-    expect(cg.edgeCount()).equals(0);
+    expect(cg.nodeCount()).toEqual(0);
+    expect(cg.edgeCount()).toEqual(0);
   });
 
   it("adds a constraint when the parents for adjacent nodes are different", function() {
@@ -34,7 +33,7 @@ describe("order/addSubgraphConstraints", function() {
     g.setParent("a", "sg1");
     g.setParent("b", "sg2");
     addSubgraphConstraints(g, cg, vs);
-    expect(cg.edges()).eqls([{ v: "sg1", w: "sg2" }]);
+    expect(cg.edges()).toEqual([{ v: "sg1", w: "sg2" }]);
   });
 
   it("works for multiple levels", function() {
@@ -51,7 +50,7 @@ describe("order/addSubgraphConstraints", function() {
     g.setParent("g", "sg5");
     g.setParent("sg5", "sg4");
     addSubgraphConstraints(g, cg, vs);
-    expect(_.sortBy(cg.edges(), "v")).eqls([
+    expect(_.sortBy(cg.edges(), "v")).toEqual([
       { v: "sg1", w: "sg4" },
       { v: "sg2", w: "sg3" }
     ]);

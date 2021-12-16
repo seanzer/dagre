@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("../chai").expect;
 var Graph = require("../../lib/graphlib").Graph;
 var initOrder = require("../../lib/order/init-order");
 
@@ -20,9 +19,9 @@ describe("order/initOrder", function() {
     g.setEdge("a", "e");
 
     var layering = initOrder(g);
-    expect(layering[0]).to.eql(["a"]);
-    expect(_.sortBy(layering[1])).to.eql(["b", "e"]);
-    expect(_.sortBy(layering[2])).to.eql(["c", "d"]);
+    expect(layering[0]).toEqual(["a"]);
+    expect(_.sortBy(layering[1])).toEqual(["b", "e"]);
+    expect(_.sortBy(layering[2])).toEqual(["c", "d"]);
   });
 
   it("assigns non-overlapping orders for each rank in a DAG", function() {
@@ -33,9 +32,9 @@ describe("order/initOrder", function() {
     g.setPath(["a", "c", "d"]);
 
     var layering = initOrder(g);
-    expect(layering[0]).to.eql(["a"]);
-    expect(_.sortBy(layering[1])).to.eql(["b", "c"]);
-    expect(_.sortBy(layering[2])).to.eql(["d"]);
+    expect(layering[0]).toEqual(["a"]);
+    expect(_.sortBy(layering[1])).toEqual(["b", "c"]);
+    expect(_.sortBy(layering[2])).toEqual(["d"]);
   });
 
   it("does not assign an order to subgraph nodes", function() {
@@ -44,6 +43,6 @@ describe("order/initOrder", function() {
     g.setParent("a", "sg1");
 
     var layering = initOrder(g);
-    expect(layering).to.eql([["a"]]);
+    expect(layering).toEqual([["a"]]);
   });
 });

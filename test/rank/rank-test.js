@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("../chai").expect;
 var rank = require("../../lib/rank");
 var Graph = require("../../lib/graphlib").Graph;
 
@@ -28,14 +27,14 @@ describe("rank", function() {
         _.forEach(g.edges(), function(e) {
           var vRank = g.node(e.v).rank;
           var wRank = g.node(e.w).rank;
-          expect(wRank - vRank).to.be.gte(g.edge(e).minlen);
+          expect(wRank - vRank).toBeGreaterThanOrEqual(g.edge(e).minlen);
         });
       });
 
       it("can rank a single node graph", function() {
         var g = new Graph().setGraph({}).setNode("a", {});
         rank(g, ranker);
-        expect(g.node("a").rank).to.equal(0);
+        expect(g.node("a").rank).toEqual(0);
       });
     });
   });

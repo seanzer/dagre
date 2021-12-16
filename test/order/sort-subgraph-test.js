@@ -1,5 +1,4 @@
 var _ = require("lodash");
-var expect = require("../chai").expect;
 var sortSubgraph = require("../../lib/order/sort-subgraph");
 var Graph = require("../../lib/graphlib").Graph;
 
@@ -20,7 +19,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(4, "y");
     _.forEach(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["y", "x"]);
+    expect(sortSubgraph(g, "movable", cg).vs).toEqual(["y", "x"]);
   });
 
   it("preserves the pos of a node (y) w/o neighbors in a flat subgraph", function() {
@@ -30,7 +29,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(4, "z");
     _.forEach(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["z", "y", "x"]);
+    expect(sortSubgraph(g, "movable", cg).vs).toEqual(["z", "y", "x"]);
   });
 
   it("biases to the left without reverse bias", function() {
@@ -38,7 +37,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(1, "y");
     _.forEach(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "y"]);
+    expect(sortSubgraph(g, "movable", cg).vs).toEqual(["x", "y"]);
   });
 
   it("biases to the right with reverse bias", function() {
@@ -46,7 +45,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(1, "y");
     _.forEach(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg, true).vs).eqls(["y", "x"]);
+    expect(sortSubgraph(g, "movable", cg, true).vs).toEqual(["y", "x"]);
   });
 
   it("aggregates stats about the subgraph", function() {
@@ -56,8 +55,8 @@ describe("order/sortSubgraph", function() {
     _.forEach(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
     var results = sortSubgraph(g, "movable", cg);
-    expect(results.barycenter).to.equal(2.25);
-    expect(results.weight).to.equal(4);
+    expect(results.barycenter).toEqual(2.25);
+    expect(results.weight).toEqual(4);
   });
 
   it("can sort a nested subgraph with no barycenter", function() {
@@ -70,7 +69,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(2, "y");
     _.forEach(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "z", "a", "b", "c"]);
+    expect(sortSubgraph(g, "movable", cg).vs).toEqual(["x", "z", "a", "b", "c"]);
   });
 
   it("can sort a nested subgraph with a barycenter", function() {
@@ -84,7 +83,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(2, "y");
     _.forEach(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
+    expect(sortSubgraph(g, "movable", cg).vs).toEqual(["x", "a", "b", "c", "z"]);
   });
 
   it("can sort a nested subgraph with no in-edges", function() {
@@ -98,7 +97,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(1, "z");
     _.forEach(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
+    expect(sortSubgraph(g, "movable", cg).vs).toEqual(["x", "a", "b", "c", "z"]);
   });
 
   it("sorts border nodes to the extremes of the subgraph", function() {
@@ -107,7 +106,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(2, "z");
     g.setNode("sg1", { borderLeft: "bl", borderRight: "br" });
     _.forEach(["x", "y", "z", "bl", "br"], function(v) { g.setParent(v, "sg1"); });
-    expect(sortSubgraph(g, "sg1", cg).vs).eqls(["bl", "x", "y", "z", "br"]);
+    expect(sortSubgraph(g, "sg1", cg).vs).toEqual(["bl", "x", "y", "z", "br"]);
   });
 
   it("assigns a barycenter to a subgraph based on previous border nodes", function() {
@@ -117,7 +116,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge("br1", "br2");
     _.forEach(["bl2", "br2"], function(v) { g.setParent(v, "sg"); });
     g.setNode("sg", { borderLeft: "bl2", borderRight: "br2" });
-    expect(sortSubgraph(g, "sg", cg)).eqls({
+    expect(sortSubgraph(g, "sg", cg)).toEqual({
       barycenter: 0.5,
       weight: 2,
       vs: ["bl2", "br2"]
