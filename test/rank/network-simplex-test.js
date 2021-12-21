@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 const Graph = require('graphlib').Graph
 const {networkSimplex} = require('../../lib/rank/network-simplex')
 const longestPath = require('../../lib/rank/util').longestPath

@@ -5,7 +5,7 @@ import { sortSubgraph } from './sort-subgraph'
 import { buildLayerGraph } from './build-layer-graph'
 import { addSubgraphConstraints } from './add-subgraph-constraints'
 import { Graph } from 'graphlib'
-import * as util from '../util'
+import * as util from '@dagre/util'
 
 /*
  * Applies heuristics to minimize edge crossings in the graph and sets the best

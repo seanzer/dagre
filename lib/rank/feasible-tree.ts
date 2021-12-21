@@ -1,6 +1,6 @@
 import { Graph } from 'graphlib'
 
-const _ = require('lodash')
+import _ from 'lodash'
 const slack = require('./util').slack
 
 /*

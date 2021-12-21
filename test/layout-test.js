@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 const {layout} = require('..').layout
 const Graph = require('graphlib').Graph
 

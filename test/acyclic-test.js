@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 const acyclic = require('../lib/acyclic')
 const Graph = require('graphlib').Graph
 const findCycles = require('graphlib').alg.findCycles

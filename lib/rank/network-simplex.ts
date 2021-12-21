@@ -2,7 +2,7 @@
 
 import { Edge, Graph } from 'graphlib'
 
-const _ = require('lodash')
+import _ from 'lodash'
 const { feasibleTree } = require('./feasible-tree')
 const slack = require('./util').slack
 const initRank = require('./util').longestPath

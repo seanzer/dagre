@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 const buildLayerMatrix = require('../../lib/util').buildLayerMatrix
 const bk = require('../../lib/position/bk')
 const findType1Conflicts = bk.findType1Conflicts

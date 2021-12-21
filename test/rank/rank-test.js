@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 const {rank} = require('../../lib/rank')
 const Graph = require('graphlib').Graph
 

@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 const Graph = require('graphlib').Graph
 const findCycles = require('graphlib').alg.findCycles
 const {greedyFAS} = require('../lib/greedy-fas')

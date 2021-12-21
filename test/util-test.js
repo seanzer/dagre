@@ -1,6 +1,6 @@
 /* eslint "no-console": off */
 
-const _ = require('lodash')
+import _ from 'lodash'
 const Graph = require('graphlib').Graph
 const util = require('../lib/util')
 

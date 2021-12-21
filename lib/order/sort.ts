@@ -1,5 +1,5 @@
-const _ = require('lodash')
-const util = require('../util')
+import _ from 'lodash'
+import * as util from '@dagre/util'
 
 export function sort(
   entries: Pick<any, 'barycenter' | 'weight' | 'vs' | 'i'>[],
@@ -36,7 +36,7 @@ export function sort(
     }
   )
 
-  const result: any = { vs: _.flatten(vs, true) }
+  const result: any = { vs: _.flatten(vs) }
   if (weight) {
     result.barycenter = sum / weight
     result.weight = weight
@@ -44,7 +44,7 @@ export function sort(
   return result
 }
 
-function consumeUnsortable(vs: any[], unsortable: void[], index: number) {
+function consumeUnsortable(vs: any[], unsortable: any[], index: number) {
   let last
   while (unsortable.length && (last = _.last(unsortable)).i <= index) {
     unsortable.pop()

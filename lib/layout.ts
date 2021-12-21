@@ -20,7 +20,7 @@ import { rank } from './rank'
 import { run as normalize, undo as normalizeUndo } from './normalize'
 import { parentDummyChains } from './parent-dummy-chains'
 import { adjust, undo as coordinateSystemUndo } from './coordinate-system'
-import position from './position'
+import { position } from './position'
 
 export function layout(g: Graph, opts: { debugTiming?: boolean } = {}) {
   const time = opts && opts.debugTiming ? utilTime : notime
