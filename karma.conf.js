@@ -15,7 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'test/**/*.js', type: 'module'}
+      {pattern: 'test/**/*-test.js', type: 'module'},
+      {pattern: 'test/**/*.test.ts', type: 'module'}
     ],
 
 
@@ -28,7 +29,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      "test/**/*.js": ['esbuild']
+      "test/**/*-test.js": ['esbuild'],
+      "test/**/*.test.ts": ['esbuild']
     },
 
 

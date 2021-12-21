@@ -1,6 +1,6 @@
 var _ = require("lodash");
 var normalize = require("../lib/normalize");
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("graphlib").Graph;
 
 describe("normalize", function() {
   var g;

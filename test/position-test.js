@@ -1,5 +1,5 @@
 var position = require("../lib/position");
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("graphlib").Graph;
 
 describe("position", function() {
   var g;

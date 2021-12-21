@@ -1,0 +1,14 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modifications",
+    "editor.formatOnPaste": true,
+    "cSpell.words": [
+        "acyclicer",
+        "linebreak",
+        "minlen",
+        "multigraph",
+        "rankdir"
+    ],
+    "standard.autoFixOnSave": true
+}

@@ -1,4 +1,4 @@
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("graphlib").Graph;
 var coordinateSystem = require("../lib/coordinate-system");
 
 describe("coordinateSystem", function() {
