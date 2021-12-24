@@ -2,61 +2,67 @@
  * Simple doubly linked list implementation derived from Cormen, et al.,
  * "Introduction to Algorithms".
  */
-export type Entry<T> = {
-  _next?: Entry<T>
-  _prev?: Entry<T>
-  value: T | null
+export interface Entry<T> {
+  readonly value: T | null
+}
+
+class UpdatableEntry<T> implements Entry<T> {
+  _next: UpdatableEntry<T> = this
+  _prev: UpdatableEntry<T> = this
+  constructor(readonly value: T | null) {}
+}
+
+function createSentinel<T>() {
+  return new UpdatableEntry<T>(null)
 }
 
 export class List<T> {
-  private _sentinel: Entry<T>
-  constructor() {
-    const sentinel: Entry<T> = { value: null }
-    sentinel._next = sentinel._prev = sentinel
-    this._sentinel = sentinel
-  }
+  private readonly _sentinel: UpdatableEntry<T> = createSentinel<T>()
 
   dequeue(): Entry<T> | undefined {
     const sentinel = this._sentinel
     const entry = sentinel._prev
-    if (entry && entry !== sentinel) {
+    if (entry !== sentinel) {
       unlink(entry)
       return entry
     }
   }
 
-  enqueue(entry: Entry<T>): void {
+  enqueue(entryOrItem: Entry<T> | T): Entry<T> {
     const sentinel = this._sentinel
-    if (entry._prev && entry._next) {
-      unlink(entry)
+    let entry: UpdatableEntry<T>
+    if (
+      entryOrItem instanceof UpdatableEntry &&
+      entryOrItem._prev &&
+      entryOrItem._next
+    ) {
+      unlink(entryOrItem)
+      entry = entryOrItem
+    } else {
+      entry = new UpdatableEntry(entryOrItem as T)
     }
+
     entry._next = sentinel._next
-    sentinel._next!._prev = entry
+    sentinel._next._prev = entry
     sentinel._next = entry
     entry._prev = sentinel
+    return entry
   }
 
   toString() {
-    const strs: string[] = []
+    const values: Array<T | null> = []
     const sentinel = this._sentinel
     let curr = sentinel._prev
     while (curr !== sentinel) {
-      strs.push(JSON.stringify(curr, filterOutLinks))
-      curr = curr!._prev
+      values.push(curr.value)
+      curr = curr._prev
     }
-    return '[' + strs.join(', ') + ']'
+    return JSON.stringify(values)
   }
 }
 
-function unlink(entry: Entry<unknown>) {
+function unlink(entry: UpdatableEntry<unknown>) {
   if (entry._prev) entry._prev._next = entry._next
-  if (entry._next) entry._next!._prev = entry._prev
-  delete entry._next
-  delete entry._prev
-}
-
-function filterOutLinks(k: string, v: unknown) {
-  if (k !== '_next' && k !== '_prev') {
-    return v
-  }
+  if (entry._next) entry._next._prev = entry._prev
+  entry._next = entry._prev = entry
 }

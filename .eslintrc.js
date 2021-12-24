@@ -28,5 +28,7 @@ module.exports = {
       exports: 'always-multiline',
       functions: 'never',
     }],
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-useless-constructor': ['error'],
   },
 }

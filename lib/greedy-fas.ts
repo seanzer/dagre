@@ -17,6 +17,7 @@ type Node = {
   w: string
   in?: number
   out?: number
+  listEntry?: Entry<Node>
 }
 
 export function greedyFAS(
@@ -45,15 +46,18 @@ function doGreedyFAS(g: Graph, buckets: List<Node>[], zeroIdx: number) {
   let entry
   while (g.nodeCount()) {
     while ((entry = sinks.dequeue())) {
+      delete entry.value?.listEntry
       removeNode(g, buckets, zeroIdx, entry)
     }
     while ((entry = sources.dequeue())) {
+      delete entry.value?.listEntry
       removeNode(g, buckets, zeroIdx, entry)
     }
     if (g.nodeCount()) {
       for (let i = buckets.length - 2; i > 0; --i) {
         entry = buckets[i].dequeue()
         if (entry) {
+          delete entry.value?.listEntry
           results.push(...removeNode(g, buckets, zeroIdx, entry, true))
           break
         }
@@ -132,12 +136,14 @@ function buildState(g: Graph, weightFn: (edge: Edge) => number) {
   return { graph: fasGraph, buckets, zeroIdx }
 }
 
-function assignBucket(buckets: List<Node>[], zeroIdx: number, entry: Node) {
-  if (entry.out == null) {
-    buckets[0].enqueue({ value: entry })
-  } else if (entry.in == null) {
-    buckets[buckets.length - 1].enqueue({ value: entry })
+function assignBucket(buckets: List<Node>[], zeroIdx: number, node: Node) {
+  if (node.out == null) {
+    node.listEntry = buckets[0].enqueue(node.listEntry ?? node)
+  } else if (node.in == null) {
+    node.listEntry = buckets[buckets.length - 1].enqueue(node.listEntry ?? node)
   } else {
-    buckets[entry.out - entry.in + zeroIdx].enqueue({ value: entry })
+    node.listEntry = buckets[node.out - node.in + zeroIdx].enqueue(
+      node.listEntry ?? node
+    )
   }
 }

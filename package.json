@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "graphlib": "^2.1.8",
+    "karma-nested-reporter": "^0.1.7",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
