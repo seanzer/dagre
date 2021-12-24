@@ -2,7 +2,7 @@ import { Graph } from 'graphlib'
 import { crossCount } from '../../lib/order/cross-count'
 
 describe('crossCount', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph().setDefaultEdgeLabel(function () {

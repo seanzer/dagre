@@ -83,7 +83,7 @@ describe('rank/nestingGraph', function () {
       expect(root).toBeTruthy()
       expect(borderTop).toBeTruthy()
       expect(g.outEdges(root, borderTop)).toHaveSize(1)
-      expect(g.hasEdge(g.outEdges(root, borderTop)[0])).toBeTrue
+      expect(g.hasEdge(g.outEdges(root, borderTop)[0])).toBeTrue()
     })
 
     it('adds an edge from root to each node with the correct minlen #1', function () {

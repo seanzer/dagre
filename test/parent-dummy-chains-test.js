@@ -16,7 +16,7 @@ describe('parentDummyChains', function () {
     g.setPath(['a', 'd1', 'b'])
 
     parentDummyChains(g)
-    expect(g.parent('d1')).toBeUndefined
+    expect(g.parent('d1')).toBeUndefined()
   })
 
   it("uses the tail's parent for the first node if it is not the root", function () {
@@ -52,8 +52,8 @@ describe('parentDummyChains', function () {
 
     parentDummyChains(g)
     expect(g.parent('d1')).toEqual('sg1')
-    expect(g.parent('d2')).toBeUndefined
-    expect(g.parent('d3')).toBeUndefined
+    expect(g.parent('d2')).toBeUndefined()
+    expect(g.parent('d3')).toBeUndefined()
   })
 
   it('handles a long chain ending in a subgraph', function () {
@@ -66,8 +66,8 @@ describe('parentDummyChains', function () {
     g.setPath(['a', 'd1', 'd2', 'd3', 'b'])
 
     parentDummyChains(g)
-    expect(g.parent('d1')).toBeUndefined
-    expect(g.parent('d2')).toBeUndefined
+    expect(g.parent('d1')).toBeUndefined()
+    expect(g.parent('d2')).toBeUndefined()
     expect(g.parent('d3')).toEqual('sg1')
   })
 
@@ -90,7 +90,7 @@ describe('parentDummyChains', function () {
     parentDummyChains(g)
     expect(g.parent('d1')).toEqual('sg2')
     expect(g.parent('d2')).toEqual('sg1')
-    expect(g.parent('d3')).toBeUndefined
+    expect(g.parent('d3')).toBeUndefined()
     expect(g.parent('d4')).toEqual('sg3')
     expect(g.parent('d5')).toEqual('sg4')
   })

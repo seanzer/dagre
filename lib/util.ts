@@ -218,9 +218,9 @@ export function maxRank(g: Graph) {
 /*
  * Partition a collection into two groups: `lhs` and `rhs`. If the supplied
  * function returns true for an entry it goes into `lhs`. Otherwise it goes
- * into `rhs.
+ * into `rhs`.
  */
-export function partition<T>(collection: Array<T>, fn: Function) {
+export function partition<T>(collection: Array<T>, fn: (value: T) => boolean) {
   const result: { lhs: T[]; rhs: T[] } = { lhs: [], rhs: [] }
   _.forEach(collection, (value: T) => {
     if (fn(value)) {
@@ -236,7 +236,7 @@ export function partition<T>(collection: Array<T>, fn: Function) {
  * Returns a new function that wraps `fn` with a timer. The wrapper logs the
  * time it takes to execute the function.
  */
-export function time(name: string, fn: Function) {
+export function time(name: string, fn: () => unknown) {
   const start = _.now()
   try {
     return fn()
@@ -245,6 +245,6 @@ export function time(name: string, fn: Function) {
   }
 }
 
-export function notime(_: string, fn: Function) {
+export function notime(_: string, fn: () => unknown) {
   return fn()
 }

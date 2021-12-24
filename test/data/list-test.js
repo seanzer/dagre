@@ -9,7 +9,7 @@ describe('data.List', function () {
 
   describe('dequeue', function () {
     it('returns undefined with an empty list', function () {
-      expect(list.dequeue()).toBeUndefined
+      expect(list.dequeue()).toBeUndefined()
     })
 
     it('unlinks and returns the first entry', function () {
@@ -45,7 +45,7 @@ describe('data.List', function () {
       list.enqueue(obj)
       list2.enqueue(obj)
 
-      expect(list.dequeue()).toBeUndefined
+      expect(list.dequeue()).toBeUndefined()
       expect(list2.dequeue()).toEqual(obj)
     })
 

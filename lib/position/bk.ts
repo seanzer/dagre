@@ -24,16 +24,10 @@ import * as util from '@dagre/util'
  * This algorithm (safely) assumes that a dummy node will only be incident on a
  * single node in the layers being scanned.
  */
-export function findType1Conflicts(
-  g: {
-    node: (arg0: any) => { (): any; new (): any; order: any; dummy: any }
-    predecessors: (arg0: any) => any
-  },
-  layering: string[][]
-) {
-  const conflicts = {}
+export function findType1Conflicts(g: Graph, layering: string[][]) {
+  const conflicts: Record<string, Record<string, boolean>> = {}
 
-  function visitLayer(prevLayer: string | any[], layer: any[]) {
+  function visitLayer(prevLayer: string[], layer: string[]) {
     let // last visited node in the previous layer that is incident on an inner
       // segment.
       k0 = 0
@@ -48,7 +42,7 @@ export function findType1Conflicts(
       const k1 = w ? g.node(w).order : prevLayerLength
 
       if (w || v === lastNode) {
-        _.forEach((layer as any).slice(scanPos, i + 1), function (scanNode) {
+        _.forEach(layer.slice(scanPos, i + 1), function (scanNode) {
           _.forEach(g.predecessors(scanNode), function (u) {
             const uLabel = g.node(u)
             const uPos = uLabel.order
@@ -72,23 +66,17 @@ export function findType1Conflicts(
   return conflicts
 }
 
-export function findType2Conflicts(
-  g: {
-    node: (arg0: any) => { (): any; new (): any; dummy: string; order: any }
-    predecessors: (arg0: any) => any
-  },
-  layering: string[][]
-) {
-  const conflicts = {}
+export function findType2Conflicts(g: Graph, layering: string[][]) {
+  const conflicts: Record<string, Record<string, boolean>> = {}
 
   function scan(
-    south: any[],
+    south: string[],
     southPos: number,
     southEnd: number,
     prevNorthBorder: number,
     nextNorthBorder: number
   ) {
-    let v: any
+    let v: string
     _.forEach(_.range(southPos, southEnd), function (i) {
       v = south[i]
       if (g.node(v).dummy) {
@@ -113,7 +101,7 @@ export function findType2Conflicts(
     _.forEach(south, function (v, southLookahead) {
       if (g.node(v).dummy === 'border') {
         const predecessors = g.predecessors(v)
-        if (predecessors.length) {
+        if (predecessors?.length) {
           nextNorthPos = g.node(predecessors[0]).order
           scan(south, southPos, southLookahead, prevNorthPos, nextNorthPos)
           southPos = southLookahead
@@ -130,22 +118,16 @@ export function findType2Conflicts(
   return conflicts
 }
 
-function findOtherInnerSegmentNode(
-  g: {
-    node: (arg0: any) => { (): any; new (): any; dummy: boolean }
-    predecessors: (arg0: any) => any
-  },
-  v: any
-) {
+function findOtherInnerSegmentNode(g: Graph, v: string) {
   if (g.node(v).dummy) {
     return _.find(g.predecessors(v), function (u) {
       return g.node(u).dummy
-    })
+    }) as string
   }
 }
 
 export function addConflict(
-  conflicts: { [x: string]: Record<string, boolean> },
+  conflicts: Record<string, Record<string, boolean>>,
   v: string,
   w: string
 ) {
@@ -163,9 +145,9 @@ export function addConflict(
 }
 
 export function hasConflict(
-  conflicts: { [x: string]: any },
-  v: number,
-  w: number
+  conflicts: Record<string, Record<string, boolean>>,
+  v: string,
+  w: string
 ) {
   if (v > w) {
     const tmp = v
@@ -184,14 +166,14 @@ export function hasConflict(
  * blocks would be split in that scenario.
  */
 export function verticalAlignment(
-  g: any,
-  layering: any,
-  conflicts: {},
-  neighborFn: (arg0: any) => any
+  g: Graph,
+  layering: string[][],
+  conflicts: Record<string, Record<string, boolean>>,
+  neighborFn: (v: string) => string[]
 ) {
-  const root: any = {}
-  const align: any = {}
-  const pos: any = {}
+  const root: Record<string, string> = {}
+  const align: Record<string, string> = {}
+  const pos: Record<string, number> = {}
 
   // We cache the position here based on the layering because the graph and
   // layering may be out of sync. The layering matrix is manipulated to
@@ -229,36 +211,32 @@ export function verticalAlignment(
     })
   })
 
-  return { root: root, align: align }
+  return { root, align }
 }
 
 export function horizontalCompaction(
   g: Graph,
-  layering: any,
-  root: { [x: string]: string | number },
-  align: {},
-  reverseSep: boolean
+  layering: string[][],
+  root: Record<string, string>,
+  align: Record<string, string>,
+  reverseSep = false
 ) {
   // This portion of the algorithm differs from BK due to a number of problems.
   // Instead of their algorithm we construct a new block graph and do two
   // sweeps. The first sweep places blocks with the smallest possible
   // coordinates. The second sweep removes unused space by moving blocks to the
   // greatest coordinates without violating separation.
-  const xs: any = {}
-  const blockG: any = buildBlockGraph(g, layering, root, reverseSep)
+  const xs: Record<string, number> = {}
+  const blockG = buildBlockGraph(g, layering, root, reverseSep)
   const borderType = reverseSep ? 'borderLeft' : 'borderRight'
 
   function iterate(
-    setXsFunc: { (elem: any): void; (elem: any): void; (arg0: string): void },
-    nextNodesFunc: {
-      (v: string): string[]
-      (v: string): string[]
-      (arg0: string): ConcatArray<string>
-    }
+    setXsFunc: (v: string) => void,
+    nextNodesFunc: (v: string) => string[]
   ) {
     let stack = blockG.nodes()
     let elem = stack.pop()
-    const visited: any = {}
+    const visited: Record<string, boolean> = {}
     while (elem) {
       if (visited[elem]) {
         setXsFunc(elem)
@@ -274,16 +252,18 @@ export function horizontalCompaction(
 
   // First pass, assign smallest coordinates
   function pass1(elem: string) {
-    xs[elem] = blockG.inEdges(elem).reduce(function (acc: number, e: Edge) {
-      return Math.max(acc, xs[e.v] + blockG.edge(e))
-    }, 0)
+    xs[elem] =
+      blockG.inEdges(elem)?.reduce(function (acc: number, e: Edge) {
+        return Math.max(acc, xs[e.v] + blockG.edge(e))
+      }, 0) ?? 0
   }
 
   // Second pass, assign greatest coordinates
   function pass2(elem: string) {
-    const min = blockG.outEdges(elem).reduce(function (acc: number, e: Edge) {
-      return Math.min(acc, xs[e.w] - blockG.edge(e))
-    }, Number.POSITIVE_INFINITY)
+    const min =
+      blockG.outEdges(elem)?.reduce(function (acc: number, e: Edge) {
+        return Math.min(acc, xs[e.w] - blockG.edge(e))
+      }, Number.POSITIVE_INFINITY) ?? Number.POSITIVE_INFINITY
 
     const node = g.node(elem)
     if (min !== Number.POSITIVE_INFINITY && node.borderType !== borderType) {
@@ -291,8 +271,8 @@ export function horizontalCompaction(
     }
   }
 
-  iterate(pass1, blockG.predecessors.bind(blockG))
-  iterate(pass2, blockG.successors.bind(blockG))
+  iterate(pass1, (v) => blockG.predecessors(v) ?? [])
+  iterate(pass2, (v) => blockG.successors(v) ?? [])
 
   // Assign x coordinates to all nodes
   _.forEach(align, function (v) {
@@ -304,20 +284,19 @@ export function horizontalCompaction(
 
 function buildBlockGraph(
   g: Graph,
-  layering: any,
-  root: { [x: string]: any },
-  reverseSep: any
-) {
+  layering: string[][],
+  root: Record<string, string>,
+  reverseSep: boolean
+): Graph {
   const blockGraph = new Graph()
-  const graphLabel = g.graph()
-  const sepFn = sep(
-    (graphLabel as any).nodesep,
-    (graphLabel as any).edgesep,
-    reverseSep
-  )
+  const graphLabel = g.graph() as unknown as {
+    nodesep: number
+    edgesep: number
+  }
+  const sepFn = sep(graphLabel.nodesep, graphLabel.edgesep, reverseSep)
 
   _.forEach(layering, function (layer) {
-    let u: string | number
+    let u: string
     _.forEach(layer, function (v) {
       const vRoot = root[v]
       blockGraph.setNode(vRoot)
@@ -336,7 +315,10 @@ function buildBlockGraph(
 /*
  * Returns the alignment that has the smallest width of the given alignments.
  */
-export function findSmallestWidthAlignment(g: any, xss: {}) {
+export function findSmallestWidthAlignment(
+  g: Graph,
+  xss: Record<string, Record<string, number>>
+) {
   return _.minBy(_.values(xss), function (xs) {
     let max = Number.NEGATIVE_INFINITY
     let min = Number.POSITIVE_INFINITY
@@ -360,12 +342,20 @@ export function findSmallestWidthAlignment(g: any, xss: {}) {
  * coordinate of the smallest width alignment.
  */
 export function alignCoordinates(
-  xss: { [x: string]: { [x: string]: any } },
-  alignTo: any
+  xss: Record<string, Record<string, number>>,
+  alignTo: Record<string, number>
 ) {
   const alignToVals = _.values(alignTo)
   const alignToMin = _.min(alignToVals)
   const alignToMax = _.max(alignToVals)
+  if (alignToMin == null) {
+    console.warn('alignToMin undefined or null')
+    return
+  }
+  if (alignToMax == null) {
+    console.warn('alignToMax undefined or null')
+    return
+  }
 
   _.forEach(['u', 'd'], function (vert) {
     _.forEach(['l', 'r'], function (horiz) {
@@ -374,8 +364,18 @@ export function alignCoordinates(
       if (xs === alignTo) return
 
       const xsVals = _.values(xs)
-      const delta =
-        horiz === 'l' ? alignToMin - _.min(xsVals) : alignToMax - _.max(xsVals)
+      const xsMin = _.min(xsVals)
+      const xsMax = _.max(xsVals)
+      if (xsMin == null) {
+        console.warn('xsMin undefined or null')
+        return
+      }
+      if (xsMax == null) {
+        console.warn('xsMax undefined or null')
+        return
+      }
+
+      const delta = horiz === 'l' ? alignToMin - xsMin : alignToMax - xsMax
 
       if (delta) {
         xss[alignment] = _.mapValues(xs, function (x) {
@@ -387,10 +387,10 @@ export function alignCoordinates(
 }
 
 export function balance(
-  xss: _.Dictionary<Record<number | string, number>>,
+  xss: Record<string, Record<string, number>>,
   align: string
 ) {
-  return _.mapValues(xss.ul, function (ignore, v) {
+  return _.mapValues(xss.ul, function (_value, v) {
     if (align) {
       return xss[align.toLowerCase()][v]
     } else {
@@ -407,8 +407,8 @@ export function positionX(g: Graph) {
     findType2Conflicts(g, layering)
   )
 
-  const xss: _.Dictionary<Record<number | string, number>> = {}
-  let adjustedLayering: any[][]
+  const xss: Record<string, Record<string, number>> = {}
+  let adjustedLayering: string[][]
   _.forEach(['u', 'd'], function (vert) {
     adjustedLayering = vert === 'u' ? layering : _.values(layering).reverse()
     _.forEach(['l', 'r'], function (horiz) {
@@ -418,7 +418,10 @@ export function positionX(g: Graph) {
         })
       }
 
-      const neighborFn = (vert === 'u' ? g.predecessors : g.successors).bind(g)
+      const neighborFn =
+        vert === 'u'
+          ? (v: string) => g.predecessors(v) ?? []
+          : (v: string) => g.successors(v) ?? []
       const align = verticalAlignment(
         g,
         adjustedLayering,
@@ -442,12 +445,14 @@ export function positionX(g: Graph) {
   })
 
   const smallestWidth = findSmallestWidthAlignment(g, xss)
-  alignCoordinates(xss, smallestWidth)
-  return balance(xss, (g.graph() as any).align)
+  if (smallestWidth != null) {
+    alignCoordinates(xss, smallestWidth)
+  }
+  return balance(xss, (g.graph() as unknown as Record<'align', string>).align)
 }
 
-function sep(nodeSep: any, edgeSep: any, reverseSep: any) {
-  return function (g: { node: (arg0: any) => any }, v: any, w: any) {
+function sep(nodeSep: number, edgeSep: number, reverseSep: boolean) {
+  return function (g: Graph, v: string, w: string) {
     const vLabel = g.node(v)
     const wLabel = g.node(w)
     let sum = 0
@@ -492,9 +497,6 @@ function sep(nodeSep: any, edgeSep: any, reverseSep: any) {
   }
 }
 
-function width(
-  g: { node: (arg0: any) => { (): any; new (): any; width: any } },
-  v: string
-) {
+function width(g: Graph, v: string): number {
   return g.node(v).width
 }

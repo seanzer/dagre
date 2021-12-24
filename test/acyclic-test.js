@@ -85,7 +85,7 @@ describe('acyclic', function () {
       g.setEdge('c', 'd', { weight: 1 })
       acyclic.run(g)
       expect(findCycles(g)).toEqual([])
-      expect(g.hasEdge('c', 'd')).toBeFalse
+      expect(g.hasEdge('c', 'd')).toBeFalse()
     })
   })
 })

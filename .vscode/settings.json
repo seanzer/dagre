@@ -5,9 +5,13 @@
     "editor.formatOnPaste": true,
     "cSpell.words": [
         "acyclicer",
+        "Brandes",
+        "edgesep",
+        "Köpf",
         "linebreak",
         "minlen",
         "multigraph",
+        "nodesep",
         "rankdir"
     ],
     "standard.autoFixOnSave": true

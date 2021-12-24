@@ -105,7 +105,7 @@ describe('network simplex', function () {
       const tree = new Graph({ directed: false })
       tree.setEdge('a', 'b', { cutvalue: 1 })
       tree.setEdge('b', 'c', { cutvalue: 1 })
-      expect(leaveEdge(tree)).toBeUndefined
+      expect(leaveEdge(tree)).toBeUndefined()
     })
 
     it('returns an edge if one is found with a negative cutvalue', function () {

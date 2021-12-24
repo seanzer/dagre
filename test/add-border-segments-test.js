@@ -90,8 +90,8 @@ describe('addBorderSegments', function () {
     })
     expect(g.parent(br1)).toEqual('sg')
 
-    expect(g.hasEdge(sgNode.borderLeft[1], sgNode.borderLeft[2])).toBeTrue
-    expect(g.hasEdge(sgNode.borderRight[1], sgNode.borderRight[2])).toBeTrue
+    expect(g.hasEdge(sgNode.borderLeft[1], sgNode.borderLeft[2])).toBeTrue()
+    expect(g.hasEdge(sgNode.borderRight[1], sgNode.borderRight[2])).toBeTrue()
   })
 
   it('adds borders for nested subgraphs', function () {

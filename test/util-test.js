@@ -23,7 +23,7 @@ describe('util', function () {
       g.setEdge('a', 'b', { weight: 1, minlen: 1 })
       g.setEdge('a', 'b', { weight: 2, minlen: 2 }, 'multi')
       const g2 = util.simplify(g)
-      expect(g2.isMultigraph()).toBeFalse
+      expect(g2.isMultigraph()).toBeFalse()
       expect(g2.edge('a', 'b')).toEqual({ weight: 3, minlen: 2 })
       expect(g2.edgeCount()).toEqual(1)
     })
@@ -47,7 +47,7 @@ describe('util', function () {
       g.setNode('b')
       const g2 = util.asNonCompoundGraph(g)
       expect(g2.node('a')).toEqual({ foo: 'bar' })
-      expect(g2.hasNode('b')).toBeTrue
+      expect(g2.hasNode('b')).toBeTrue()
     })
 
     it('copies all edges', function () {
@@ -61,8 +61,8 @@ describe('util', function () {
     it('does not copy compound nodes', function () {
       g.setParent('a', 'sg1')
       const g2 = util.asNonCompoundGraph(g)
-      expect(g2.parent(g)).toBeUndefined
-      expect(g2.isCompound()).toBeFalse
+      expect(g2.parent(g)).toBeUndefined()
+      expect(g2.isCompound()).toBeFalse()
     })
 
     it('copies the graph object', function () {

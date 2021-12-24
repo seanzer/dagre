@@ -1,6 +1,7 @@
 import _ from 'lodash'
-const buildLayerMatrix = require('../../lib/util').buildLayerMatrix
-const bk = require('../../lib/position/bk')
+import { buildLayerMatrix } from '../../lib/util'
+import * as bk from '@dagre/position/bk'
+import { Graph } from 'graphlib'
 const findType1Conflicts = bk.findType1Conflicts
 const findType2Conflicts = bk.findType2Conflicts
 const addConflict = bk.addConflict
@@ -11,21 +12,21 @@ const alignCoordinates = bk.alignCoordinates
 const balance = bk.balance
 const findSmallestWidthAlignment = bk.findSmallestWidthAlignment
 const positionX = bk.positionX
-const Graph = require('graphlib').Graph
 
 describe('position/bk', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph().setGraph({})
   })
 
   describe('findType1Conflicts', function () {
-    let layering
+    let layering: string[][]
 
     beforeEach(function () {
-      g
-        .setDefaultEdgeLabel(function () { return {} })
+      g.setDefaultEdgeLabel(function () {
+        return {}
+      })
         .setNode('a', { rank: 0, order: 0 })
         .setNode('b', { rank: 0, order: 1 })
         .setNode('c', { rank: 1, order: 0 })
@@ -44,14 +45,14 @@ describe('position/bk', function () {
       g.setEdge('b', 'd')
 
       const conflicts = findType1Conflicts(g, layering)
-      expect(hasConflict(conflicts, 'a', 'c')).toBeFalse
-      expect(hasConflict(conflicts, 'b', 'd')).toBeFalse
+      expect(hasConflict(conflicts, 'a', 'c')).toBeFalse()
+      expect(hasConflict(conflicts, 'b', 'd')).toBeFalse()
     })
 
     it('does not mark type-0 conflicts (no dummies)', function () {
       const conflicts = findType1Conflicts(g, layering)
-      expect(hasConflict(conflicts, 'a', 'd')).toBeFalse
-      expect(hasConflict(conflicts, 'b', 'c')).toBeFalse
+      expect(hasConflict(conflicts, 'a', 'd')).toBeFalse()
+      expect(hasConflict(conflicts, 'b', 'c')).toBeFalse()
     })
 
     _.forEach(['a', 'b', 'c', 'd'], function (v) {
@@ -59,8 +60,8 @@ describe('position/bk', function () {
         g.node(v).dummy = true
 
         const conflicts = findType1Conflicts(g, layering)
-        expect(hasConflict(conflicts, 'a', 'd')).toBeFalse
-        expect(hasConflict(conflicts, 'b', 'c')).toBeFalse
+        expect(hasConflict(conflicts, 'a', 'd')).toBeFalse()
+        expect(hasConflict(conflicts, 'b', 'c')).toBeFalse()
       })
     })
 
@@ -74,11 +75,11 @@ describe('position/bk', function () {
 
         const conflicts = findType1Conflicts(g, layering)
         if (v === 'a' || v === 'd') {
-          expect(hasConflict(conflicts, 'a', 'd')).toBeTrue
-          expect(hasConflict(conflicts, 'b', 'c')).toBeFalse
+          expect(hasConflict(conflicts, 'a', 'd')).toBeTrue()
+          expect(hasConflict(conflicts, 'b', 'c')).toBeFalse()
         } else {
-          expect(hasConflict(conflicts, 'a', 'd')).toBeFalse
-          expect(hasConflict(conflicts, 'b', 'c')).toBeTrue
+          expect(hasConflict(conflicts, 'a', 'd')).toBeFalse()
+          expect(hasConflict(conflicts, 'b', 'c')).toBeTrue()
         }
       })
     })
@@ -89,18 +90,19 @@ describe('position/bk', function () {
       })
 
       const conflicts = findType1Conflicts(g, layering)
-      expect(hasConflict(conflicts, 'a', 'd')).toBeFalse
-      expect(hasConflict(conflicts, 'b', 'c')).toBeFalse
+      expect(hasConflict(conflicts, 'a', 'd')).toBeFalse()
+      expect(hasConflict(conflicts, 'b', 'c')).toBeFalse()
       findType1Conflicts(g, layering)
     })
   })
 
   describe('findType2Conflicts', function () {
-    let layering
+    let layering: string[][]
 
     beforeEach(function () {
-      g
-        .setDefaultEdgeLabel(function () { return {} })
+      g.setDefaultEdgeLabel(function () {
+        return {}
+      })
         .setNode('a', { rank: 0, order: 0 })
         .setNode('b', { rank: 0, order: 1 })
         .setNode('c', { rank: 1, order: 0 })
@@ -122,8 +124,8 @@ describe('position/bk', function () {
       })
 
       const conflicts = findType2Conflicts(g, layering)
-      expect(hasConflict(conflicts, 'a', 'd')).toBeTrue
-      expect(hasConflict(conflicts, 'b', 'c')).toBeFalse
+      expect(hasConflict(conflicts, 'a', 'd')).toBeTrue()
+      expect(hasConflict(conflicts, 'b', 'c')).toBeFalse()
       findType1Conflicts(g, layering)
     })
 
@@ -137,8 +139,8 @@ describe('position/bk', function () {
       })
 
       const conflicts = findType2Conflicts(g, layering)
-      expect(hasConflict(conflicts, 'a', 'd')).toBeFalse
-      expect(hasConflict(conflicts, 'b', 'c')).toBeTrue
+      expect(hasConflict(conflicts, 'a', 'd')).toBeFalse()
+      expect(hasConflict(conflicts, 'b', 'c')).toBeTrue()
       findType1Conflicts(g, layering)
     })
   })
@@ -147,16 +149,16 @@ describe('position/bk', function () {
     it('can  for a type-1 conflict regardless of edge orientation', function () {
       const conflicts = {}
       addConflict(conflicts, 'b', 'a')
-      expect(hasConflict(conflicts, 'a', 'b')).toBeTrue
-      expect(hasConflict(conflicts, 'b', 'a')).toBeTrue
+      expect(hasConflict(conflicts, 'a', 'b')).toBeTrue()
+      expect(hasConflict(conflicts, 'b', 'a')).toBeTrue()
     })
 
     it('works for multiple conflicts with the same node', function () {
       const conflicts = {}
       addConflict(conflicts, 'a', 'b')
       addConflict(conflicts, 'a', 'c')
-      expect(hasConflict(conflicts, 'a', 'b')).toBeTrue
-      expect(hasConflict(conflicts, 'a', 'c')).toBeTrue
+      expect(hasConflict(conflicts, 'a', 'b')).toBeTrue()
+      expect(hasConflict(conflicts, 'a', 'c')).toBeTrue()
     })
   })
 
@@ -168,7 +170,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { a: 'a', b: 'b' },
         align: { a: 'a', b: 'b' },
@@ -183,7 +190,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { a: 'a', b: 'a' },
         align: { a: 'b', b: 'a' },
@@ -200,7 +212,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { a: 'a', b: 'b', c: 'a' },
         align: { a: 'c', b: 'b', c: 'a' },
@@ -221,7 +238,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { z: 'z', b: 'b', c: 'z' },
         align: { z: 'c', b: 'b', c: 'z' },
@@ -240,7 +262,12 @@ describe('position/bk', function () {
 
       addConflict(conflicts, 'a', 'c')
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { a: 'a', b: 'b', c: 'b' },
         align: { a: 'a', b: 'c', c: 'b' },
@@ -259,7 +286,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       // c will align with b, so d will not be able to align with a, because
       // (a,d) and (c,b) cross.
       expect(result).toEqual({
@@ -280,7 +312,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { a: 'a', b: 'b', c: 'c', d: 'b' },
         align: { a: 'a', b: 'd', c: 'c', d: 'b' },
@@ -298,7 +335,12 @@ describe('position/bk', function () {
       const layering = buildLayerMatrix(g)
       const conflicts = {}
 
-      const result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g))
+      const result = verticalAlignment(
+        g,
+        layering,
+        conflicts,
+        g.predecessors.bind(g)
+      )
       expect(result).toEqual({
         root: { a: 'a', b: 'a', c: 'c', d: 'a' },
         align: { a: 'b', b: 'd', c: 'c', d: 'a' },
@@ -439,7 +481,7 @@ describe('position/bk', function () {
     it('handles labelpos = l', function () {
       const root = { a: 'a', b: 'b', c: 'c' }
       const align = { a: 'a', b: 'b', c: 'c' }
-      g.graph().edgesep = 50
+      ;(g.graph() as any).edgesep = 50
       g.setNode('a', { rank: 0, order: 0, width: 100, dummy: 'edge' })
       g.setNode('b', {
         rank: 0,
@@ -450,7 +492,13 @@ describe('position/bk', function () {
       })
       g.setNode('c', { rank: 0, order: 2, width: 300, dummy: 'edge' })
 
-      const xs = horizontalCompaction(g, buildLayerMatrix(g), root, align)
+      const xs = horizontalCompaction(
+        g,
+        buildLayerMatrix(g),
+        root,
+        align,
+        false
+      )
       expect(xs.a).toEqual(0)
       expect(xs.b).toEqual(xs.a + 100 / 2 + 50 + 200)
       expect(xs.c).toEqual(xs.b + 0 + 50 + 300 / 2)

@@ -13,6 +13,9 @@
     "graph",
     "layout"
   ],
+  "scripts": {
+    "test": "karma start --singleRun --browsers ChromeHeadless"
+  },
   "dependencies": {
     "graphlib": "^2.1.8",
     "lodash": "^4.17.21"
@@ -20,8 +23,9 @@
   "devDependencies": {
     "@types/graphlib": "^2.1.8",
     "@types/jasmine": "^3.10.2",
+    "@types/karma-jasmine": "^4.0.2",
     "@types/lodash": "^4.14.178",
-    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.7.0",
     "benchmark": "2.1.4",
     "browserify": "16.5.1",
