@@ -1,5 +1,5 @@
 import _ from 'lodash'
-const {layout} = require('..').layout
+const layout = require('../lib/layout').layout
 const Graph = require('graphlib').Graph
 
 describe('layout', function () {

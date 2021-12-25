@@ -1,7 +1,6 @@
 import { Graph } from 'graphlib'
-
 import _ from 'lodash'
-const slack = require('./util').slack
+import { slack } from './util'
 
 /*
  * Constructs a spanning tree with tight edges and adjusted the input node's
@@ -39,8 +38,10 @@ export function feasibleTree(g: Graph) {
   let edge, delta
   while (tightTree(t, g) < size) {
     edge = findMinSlackEdge(t, g)
-    delta = t.hasNode(edge.v) ? slack(g, edge) : -slack(g, edge)
-    shiftRanks(t, g, delta)
+    if (edge) {
+      delta = t.hasNode(edge.v) ? slack(g, edge) : -slack(g, edge)
+      shiftRanks(t, g, delta)
+    }
   }
 
   return t

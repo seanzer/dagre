@@ -345,9 +345,9 @@ export function alignCoordinates(
   xss: Record<string, Record<string, number>>,
   alignTo: Record<string, number>
 ) {
-  const alignToVals = _.values(alignTo)
-  const alignToMin = _.min(alignToVals)
-  const alignToMax = _.max(alignToVals)
+  const alignToValues = _.values(alignTo)
+  const alignToMin = _.min(alignToValues)
+  const alignToMax = _.max(alignToValues)
   if (alignToMin == null) {
     console.warn('alignToMin undefined or null')
     return
@@ -358,14 +358,14 @@ export function alignCoordinates(
   }
 
   _.forEach(['u', 'd'], function (vert) {
-    _.forEach(['l', 'r'], function (horiz) {
-      const alignment = vert + horiz
+    _.forEach(['l', 'r'], function (horizontal) {
+      const alignment = vert + horizontal
       const xs = xss[alignment]
       if (xs === alignTo) return
 
-      const xsVals = _.values(xs)
-      const xsMin = _.min(xsVals)
-      const xsMax = _.max(xsVals)
+      const xsValues = _.values(xs)
+      const xsMin = _.min(xsValues)
+      const xsMax = _.max(xsValues)
       if (xsMin == null) {
         console.warn('xsMin undefined or null')
         return
@@ -375,7 +375,7 @@ export function alignCoordinates(
         return
       }
 
-      const delta = horiz === 'l' ? alignToMin - xsMin : alignToMax - xsMax
+      const delta = horizontal === 'l' ? alignToMin - xsMin : alignToMax - xsMax
 
       if (delta) {
         xss[alignment] = _.mapValues(xs, function (x) {
@@ -388,7 +388,7 @@ export function alignCoordinates(
 
 export function balance(
   xss: Record<string, Record<string, number>>,
-  align: string
+  align?: string
 ) {
   return _.mapValues(xss.ul, function (_value, v) {
     if (align) {
@@ -411,8 +411,8 @@ export function positionX(g: Graph) {
   let adjustedLayering: string[][]
   _.forEach(['u', 'd'], function (vert) {
     adjustedLayering = vert === 'u' ? layering : _.values(layering).reverse()
-    _.forEach(['l', 'r'], function (horiz) {
-      if (horiz === 'r') {
+    _.forEach(['l', 'r'], function (horizontal) {
+      if (horizontal === 'r') {
         adjustedLayering = _.map(adjustedLayering, function (inner) {
           return _.values(inner).reverse()
         })
@@ -433,14 +433,14 @@ export function positionX(g: Graph) {
         adjustedLayering,
         align.root,
         align.align,
-        horiz === 'r'
+        horizontal === 'r'
       )
-      if (horiz === 'r') {
+      if (horizontal === 'r') {
         xs = _.mapValues(xs, function (x) {
           return -x
         })
       }
-      xss[vert + horiz] = xs
+      xss[vert + horizontal] = xs
     })
   })
 

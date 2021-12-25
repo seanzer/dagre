@@ -1,1 +1,1 @@
-module.exports = "0.8.6-pre";
+export default '0.8.6-pre'

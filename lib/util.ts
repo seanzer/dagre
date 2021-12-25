@@ -236,7 +236,7 @@ export function partition<T>(collection: Array<T>, fn: (value: T) => boolean) {
  * Returns a new function that wraps `fn` with a timer. The wrapper logs the
  * time it takes to execute the function.
  */
-export function time(name: string, fn: () => unknown) {
+export function time<T>(name: string, fn: () => T) {
   const start = _.now()
   try {
     return fn()
@@ -245,6 +245,6 @@ export function time(name: string, fn: () => unknown) {
   }
 }
 
-export function notime(_: string, fn: () => unknown) {
+export function notime<T>(_: string, fn: () => T) {
   return fn()
 }

@@ -1,6 +1,6 @@
 import _ from 'lodash'
-const Graph = require('graphlib').Graph
-const {feasibleTree} = require('../../lib/rank/feasible-tree')
+import { Graph } from 'graphlib'
+import { feasibleTree } from '@dagre/rank/feasible-tree'
 
 describe('feasibleTree', function () {
   it('creates a tree for a trivial input graph', function () {

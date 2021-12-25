@@ -20,14 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-module.exports = {
-  graphlib: require('graphlib'),
+import { time, notime } from './lib/util'
+import libVersion from './lib/version'
 
-  layout: require('./lib/layout'),
-  debug: require('./lib/debug'),
-  util: {
-    time: require('./lib/util').time,
-    notime: require('./lib/util').notime,
-  },
-  version: require('./lib/version'),
-}
+export { layout } from './lib/layout'
+export const util = { time, notime }
+export const version = libVersion

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { buildLayerMatrix } from '../../lib/util'
+import { buildLayerMatrix } from '@dagre/util'
 import * as bk from '@dagre/position/bk'
 import { Graph } from 'graphlib'
 const findType1Conflicts = bk.findType1Conflicts
@@ -174,7 +174,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { a: 'a', b: 'b' },
@@ -194,7 +194,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { a: 'a', b: 'a' },
@@ -216,7 +216,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { a: 'a', b: 'b', c: 'a' },
@@ -242,7 +242,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { z: 'z', b: 'b', c: 'z' },
@@ -266,7 +266,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { a: 'a', b: 'b', c: 'b' },
@@ -290,7 +290,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       // c will align with b, so d will not be able to align with a, because
       // (a,d) and (c,b) cross.
@@ -316,7 +316,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { a: 'a', b: 'b', c: 'c', d: 'b' },
@@ -339,7 +339,7 @@ describe('position/bk', function () {
         g,
         layering,
         conflicts,
-        g.predecessors.bind(g)
+        (v) => g.predecessors(v) ?? []
       )
       expect(result).toEqual({
         root: { a: 'a', b: 'a', c: 'c', d: 'a' },
@@ -348,7 +348,7 @@ describe('position/bk', function () {
     })
   })
 
-  describe('horizonalCompaction', function () {
+  describe('horizontalCompaction', function () {
     it('places the center of a single node graph at origin (0,0)', function () {
       const root = { a: 'a' }
       const align = { a: 'a' }
@@ -361,7 +361,7 @@ describe('position/bk', function () {
     it('separates adjacent nodes by specified node separation', function () {
       const root = { a: 'a', b: 'b' }
       const align = { a: 'a', b: 'b' }
-      g.graph().nodesep = 100
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 100
       g.setNode('a', { rank: 0, order: 0, width: 100 })
       g.setNode('b', { rank: 0, order: 1, width: 200 })
 
@@ -373,7 +373,7 @@ describe('position/bk', function () {
     it('separates adjacent edges by specified node separation', function () {
       const root = { a: 'a', b: 'b' }
       const align = { a: 'a', b: 'b' }
-      g.graph().edgesep = 20
+      ;(g.graph() as unknown as Record<'edgesep', number>).edgesep = 20
       g.setNode('a', { rank: 0, order: 0, width: 100, dummy: true })
       g.setNode('b', { rank: 0, order: 1, width: 200, dummy: true })
 
@@ -396,7 +396,7 @@ describe('position/bk', function () {
     it('separates blocks with the appropriate separation', function () {
       const root = { a: 'a', b: 'a', c: 'c' }
       const align = { a: 'b', b: 'a', c: 'c' }
-      g.graph().nodesep = 75
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 75
       g.setNode('a', { rank: 0, order: 0, width: 100 })
       g.setNode('b', { rank: 1, order: 1, width: 200 })
       g.setNode('c', { rank: 1, order: 0, width: 50 })
@@ -410,7 +410,7 @@ describe('position/bk', function () {
     it('separates classes with the appropriate separation', function () {
       const root = { a: 'a', b: 'b', c: 'c', d: 'b' }
       const align = { a: 'a', b: 'd', c: 'c', d: 'b' }
-      g.graph().nodesep = 75
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 75
       g.setNode('a', { rank: 0, order: 0, width: 100 })
       g.setNode('b', { rank: 0, order: 1, width: 200 })
       g.setNode('c', { rank: 1, order: 0, width: 50 })
@@ -426,7 +426,7 @@ describe('position/bk', function () {
     it('shifts classes by max sep from the adjacent block #1', function () {
       const root = { a: 'a', b: 'b', c: 'a', d: 'b' }
       const align = { a: 'c', b: 'd', c: 'a', d: 'b' }
-      g.graph().nodesep = 75
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 75
       g.setNode('a', { rank: 0, order: 0, width: 50 })
       g.setNode('b', { rank: 0, order: 1, width: 150 })
       g.setNode('c', { rank: 1, order: 0, width: 60 })
@@ -442,7 +442,7 @@ describe('position/bk', function () {
     it('shifts classes by max sep from the adjacent block #2', function () {
       const root = { a: 'a', b: 'b', c: 'a', d: 'b' }
       const align = { a: 'c', b: 'd', c: 'a', d: 'b' }
-      g.graph().nodesep = 75
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 75
       g.setNode('a', { rank: 0, order: 0, width: 50 })
       g.setNode('b', { rank: 0, order: 1, width: 70 })
       g.setNode('c', { rank: 1, order: 0, width: 60 })
@@ -458,7 +458,7 @@ describe('position/bk', function () {
     it('cascades class shift', function () {
       const root = { a: 'a', b: 'b', c: 'c', d: 'd', e: 'b', f: 'f', g: 'd' }
       const align = { a: 'a', b: 'e', c: 'c', d: 'g', e: 'b', f: 'f', g: 'd' }
-      g.graph().nodesep = 75
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 75
       g.setNode('a', { rank: 0, order: 0, width: 50 })
       g.setNode('b', { rank: 0, order: 1, width: 50 })
       g.setNode('c', { rank: 1, order: 0, width: 50 })
@@ -481,7 +481,7 @@ describe('position/bk', function () {
     it('handles labelpos = l', function () {
       const root = { a: 'a', b: 'b', c: 'c' }
       const align = { a: 'a', b: 'b', c: 'c' }
-      ;(g.graph() as any).edgesep = 50
+      ;(g.graph() as unknown as Record<'edgesep', number>).edgesep = 50
       g.setNode('a', { rank: 0, order: 0, width: 100, dummy: 'edge' })
       g.setNode('b', {
         rank: 0,
@@ -507,7 +507,7 @@ describe('position/bk', function () {
     it('handles labelpos = c', function () {
       const root = { a: 'a', b: 'b', c: 'c' }
       const align = { a: 'a', b: 'b', c: 'c' }
-      g.graph().edgesep = 50
+      ;(g.graph() as unknown as Record<'edgesep', number>).edgesep = 50
       g.setNode('a', { rank: 0, order: 0, width: 100, dummy: 'edge' })
       g.setNode('b', {
         rank: 0,
@@ -527,7 +527,7 @@ describe('position/bk', function () {
     it('handles labelpos = r', function () {
       const root = { a: 'a', b: 'b', c: 'c' }
       const align = { a: 'a', b: 'b', c: 'c' }
-      g.graph().edgesep = 50
+      ;(g.graph() as unknown as Record<'edgesep', number>).edgesep = 50
       g.setNode('a', { rank: 0, order: 0, width: 100, dummy: 'edge' })
       g.setNode('b', {
         rank: 0,
@@ -667,7 +667,9 @@ describe('position/bk', function () {
     })
 
     it('centers a node if it is a predecessor of two same sized nodes', function () {
-      g.graph().nodesep = 10
+      // Prettier keeps re-adding the extra semi
+      // eslint-disable-next-line @typescript-eslint/no-extra-semi
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 10
       g.setNode('a', { rank: 0, order: 0, width: 20 })
       g.setNode('b', { rank: 1, order: 0, width: 50 })
       g.setNode('c', { rank: 1, order: 1, width: 50 })
@@ -680,7 +682,9 @@ describe('position/bk', function () {
     })
 
     it('shifts blocks on both sides of aligned block', function () {
-      g.graph().nodesep = 10
+      // Prettier keeps re-adding the extra semi
+      // eslint-disable-next-line @typescript-eslint/no-extra-semi
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 10
       g.setNode('a', { rank: 0, order: 0, width: 50 })
       g.setNode('b', { rank: 0, order: 1, width: 60 })
       g.setNode('c', { rank: 1, order: 0, width: 70 })
@@ -699,7 +703,9 @@ describe('position/bk', function () {
     })
 
     it('aligns inner segments', function () {
-      g.graph().nodesep = 10
+      // Prettier keeps re-adding the extra semi
+      // eslint-disable-next-line @typescript-eslint/no-extra-semi
+      ;(g.graph() as unknown as Record<'nodesep', number>).nodesep = 10
       g.setNode('a', { rank: 0, order: 0, width: 50, dummy: true })
       g.setNode('b', { rank: 0, order: 1, width: 60 })
       g.setNode('c', { rank: 1, order: 0, width: 70 })

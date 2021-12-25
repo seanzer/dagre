@@ -29,7 +29,7 @@ describe('data.List', function () {
       expect(list.dequeue()).toEqual(jasmine.objectContaining({ value: obj2 }))
     })
 
-    it('unlinks and relinks an entry if it is re-enqueued', function () {
+    it('unlinks and re-links an entry if it is re-enqueued', function () {
       const obj1 = {}
       const obj2 = {}
       list.enqueue(obj1)
@@ -40,7 +40,7 @@ describe('data.List', function () {
       expect(list.dequeue()).toEqual(jasmine.objectContaining({ value: obj1 }))
     })
 
-    it('unlinks and relinks an entry if it is enqueued on another list', function () {
+    it('unlinks and re-links an entry if it is enqueued on another list', function () {
       const obj = {}
       const list2 = new List()
       const entry = list.enqueue(obj)
