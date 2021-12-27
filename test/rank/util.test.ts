@@ -1,11 +1,10 @@
-const Graph = require('graphlib').Graph
-const normalizeRanks = require('../../lib/util').normalizeRanks
-const rankUtil = require('../../lib/rank/util')
-const longestPath = rankUtil.longestPath
+import { Graph } from 'graphlib'
+import { normalizeRanks } from '../../lib/util'
+import { longestPath } from '../../lib/rank/util'
 
 describe('rank/util', function () {
   describe('longestPath', function () {
-    let g
+    let g: Graph
 
     beforeEach(function () {
       g = new Graph()

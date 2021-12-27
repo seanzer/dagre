@@ -8,12 +8,15 @@
         "Brandes",
         "Cormen",
         "edgesep",
+        "Gansner",
         "Köpf",
         "labelpos",
         "linebreak",
         "minlen",
         "multigraph",
         "nodesep",
+        "postorder",
+        "preorder",
         "rankdir"
     ],
     "standard.autoFixOnSave": true

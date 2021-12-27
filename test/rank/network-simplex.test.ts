@@ -1,37 +1,55 @@
 import _ from 'lodash'
-const Graph = require('graphlib').Graph
-const {networkSimplex} = require('../../lib/rank/network-simplex')
-const longestPath = require('../../lib/rank/util').longestPath
-const initLowLimValues = networkSimplex.initLowLimValues
-const initCutValues = networkSimplex.initCutValues
-const calcCutValue = networkSimplex.calcCutValue
-const leaveEdge = networkSimplex.leaveEdge
-const enterEdge = networkSimplex.enterEdge
-const exchangeEdges = networkSimplex.exchangeEdges
-const normalizeRanks = require('../../lib/util').normalizeRanks
+import { Edge, Graph } from 'graphlib'
+import { networkSimplex } from '@dagre/rank/network-simplex'
+import { longestPath } from '@dagre/rank/util'
+import { normalizeRanks } from '@dagre/util'
+const {
+  initLowLimValues,
+  initCutValues,
+  calcCutValue,
+  leaveEdge,
+  enterEdge,
+  exchangeEdges,
+} = networkSimplex
 
 describe('network simplex', function () {
-  let g, t, gansnerGraph, gansnerTree
+  let g: Graph, t: Graph, gansnerGraph: Graph, gansnerTree: Graph
 
   beforeEach(function () {
     g = new Graph({ multigraph: true })
-      .setDefaultNodeLabel(function () { return {} })
-      .setDefaultEdgeLabel(function () { return { minlen: 1, weight: 1 } })
+      .setDefaultNodeLabel(function () {
+        return {}
+      })
+      .setDefaultEdgeLabel(function () {
+        return { minlen: 1, weight: 1 }
+      })
 
     t = new Graph({ directed: false })
-      .setDefaultNodeLabel(function () { return {} })
-      .setDefaultEdgeLabel(function () { return {} })
+      .setDefaultNodeLabel(function () {
+        return {}
+      })
+      .setDefaultEdgeLabel(function () {
+        return {}
+      })
 
     gansnerGraph = new Graph()
-      .setDefaultNodeLabel(function () { return {} })
-      .setDefaultEdgeLabel(function () { return { minlen: 1, weight: 1 } })
+      .setDefaultNodeLabel(function () {
+        return {}
+      })
+      .setDefaultEdgeLabel(function () {
+        return { minlen: 1, weight: 1 }
+      })
       .setPath(['a', 'b', 'c', 'd', 'h'])
       .setPath(['a', 'e', 'g', 'h'])
       .setPath(['a', 'f', 'g'])
 
     gansnerTree = new Graph({ directed: false })
-      .setDefaultNodeLabel(function () { return {} })
-      .setDefaultEdgeLabel(function () { return {} })
+      .setDefaultNodeLabel(function () {
+        return {}
+      })
+      .setDefaultEdgeLabel(function () {
+        return {}
+      })
       .setPath(['a', 'b', 'c', 'd', 'h', 'g', 'e'])
       .setEdge('g', 'f')
   })
@@ -118,8 +136,7 @@ describe('network simplex', function () {
 
   describe('enterEdge', function () {
     it('finds an edge from the head to tail component', function () {
-      g
-        .setNode('a', { rank: 0 })
+      g.setNode('a', { rank: 0 })
         .setNode('b', { rank: 2 })
         .setNode('c', { rank: 3 })
         .setPath(['a', 'b', 'c'])
@@ -132,8 +149,7 @@ describe('network simplex', function () {
     })
 
     it('works when the root of the tree is in the tail component', function () {
-      g
-        .setNode('a', { rank: 0 })
+      g.setNode('a', { rank: 0 })
         .setNode('b', { rank: 2 })
         .setNode('c', { rank: 3 })
         .setPath(['a', 'b', 'c'])
@@ -146,8 +162,7 @@ describe('network simplex', function () {
     })
 
     it('finds the edge with the least slack', function () {
-      g
-        .setNode('a', { rank: 0 })
+      g.setNode('a', { rank: 0 })
         .setNode('b', { rank: 1 })
         .setNode('c', { rank: 3 })
         .setNode('d', { rank: 4 })
@@ -209,7 +224,9 @@ describe('network simplex', function () {
   describe('initLowLimValues', function () {
     it('assigns low, lim, and parent for each node in a tree', function () {
       const g = new Graph()
-        .setDefaultNodeLabel(function () { return {} })
+        .setDefaultNodeLabel(function () {
+          return {}
+        })
         .setNodes(['a', 'b', 'c', 'd', 'e'])
         .setPath(['a', 'b', 'a', 'c', 'd', 'c', 'e'])
 
@@ -221,8 +238,13 @@ describe('network simplex', function () {
       const d = g.node('d')
       const e = g.node('e')
 
-      expect(_.sortBy(_.map(g.nodes(), function (v) { return g.node(v).lim })))
-        .toEqual(_.range(1, 6))
+      expect(
+        _.sortBy(
+          _.map(g.nodes(), function (v) {
+            return g.node(v).lim
+          })
+        )
+      ).toEqual(_.range(1, 6))
 
       expect(a).toEqual({ low: 1, lim: 5 })
 
@@ -261,7 +283,11 @@ describe('network simplex', function () {
       expect(t.edge('g', 'f').cutvalue).toEqual(0)
 
       // ensure lim numbers look right
-      const lims = _.sortBy(_.map(t.nodes(), function (v) { return t.node(v).lim }))
+      const lims = _.sortBy(
+        _.map(t.nodes(), function (v) {
+          return t.node(v).lim
+        })
+      )
       expect(lims).toEqual(_.range(1, 9))
     })
 
@@ -307,33 +333,23 @@ describe('network simplex', function () {
 
     it('works for 3-node tree with gc -> c -> p', function () {
       g.setPath(['gc', 'c', 'p'])
-      t
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('p', 'c')
+      t.setEdge('gc', 'c', { cutvalue: 3 }).setEdge('p', 'c')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(3)
     })
 
     it('works for 3-node tree with gc -> c <- p', function () {
-      g
-        .setEdge('p', 'c')
-        .setEdge('gc', 'c')
-      t
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('p', 'c')
+      g.setEdge('p', 'c').setEdge('gc', 'c')
+      t.setEdge('gc', 'c', { cutvalue: 3 }).setEdge('p', 'c')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(-1)
     })
 
     it('works for 3-node tree with gc <- c -> p', function () {
-      g
-        .setEdge('c', 'p')
-        .setEdge('c', 'gc')
-      t
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('p', 'c')
+      g.setEdge('c', 'p').setEdge('c', 'gc')
+      t.setEdge('gc', 'c', { cutvalue: 3 }).setEdge('p', 'c')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(-1)
@@ -341,117 +357,81 @@ describe('network simplex', function () {
 
     it('works for 3-node tree with gc <- c <- p', function () {
       g.setPath(['p', 'c', 'gc'])
-      t
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('p', 'c')
+      t.setEdge('gc', 'c', { cutvalue: 3 }).setEdge('p', 'c')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(3)
     })
 
     it('works for 4-node tree with gc -> c -> p -> o, with o -> c', function () {
-      g
-        .setEdge('o', 'c', { weight: 7 })
-        .setPath(['gc', 'c', 'p', 'o'])
-      t
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setPath(['c', 'p', 'o'])
+      g.setEdge('o', 'c', { weight: 7 }).setPath(['gc', 'c', 'p', 'o'])
+      t.setEdge('gc', 'c', { cutvalue: 3 }).setPath(['c', 'p', 'o'])
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(-4)
     })
 
     it('works for 4-node tree with gc -> c -> p -> o, with o <- c', function () {
-      g
-        .setEdge('c', 'o', { weight: 7 })
-        .setPath(['gc', 'c', 'p', 'o'])
-      t
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setPath(['c', 'p', 'o'])
+      g.setEdge('c', 'o', { weight: 7 }).setPath(['gc', 'c', 'p', 'o'])
+      t.setEdge('gc', 'c', { cutvalue: 3 }).setPath(['c', 'p', 'o'])
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(10)
     })
 
     it('works for 4-node tree with o -> gc -> c -> p, with o -> c', function () {
-      g
-        .setEdge('o', 'c', { weight: 7 })
-        .setPath(['o', 'gc', 'c', 'p'])
-      t
-        .setEdge('o', 'gc')
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('c', 'p')
+      g.setEdge('o', 'c', { weight: 7 }).setPath(['o', 'gc', 'c', 'p'])
+      t.setEdge('o', 'gc').setEdge('gc', 'c', { cutvalue: 3 }).setEdge('c', 'p')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(-4)
     })
 
     it('works for 4-node tree with o -> gc -> c -> p, with o <- c', function () {
-      g
-        .setEdge('c', 'o', { weight: 7 })
-        .setPath(['o', 'gc', 'c', 'p'])
-      t
-        .setEdge('o', 'gc')
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('c', 'p')
+      g.setEdge('c', 'o', { weight: 7 }).setPath(['o', 'gc', 'c', 'p'])
+      t.setEdge('o', 'gc').setEdge('gc', 'c', { cutvalue: 3 }).setEdge('c', 'p')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(10)
     })
 
     it('works for 4-node tree with gc -> c <- p -> o, with o -> c', function () {
-      g
-        .setEdge('gc', 'c')
+      g.setEdge('gc', 'c')
         .setEdge('p', 'c')
         .setEdge('p', 'o')
         .setEdge('o', 'c', { weight: 7 })
-      t
-        .setEdge('o', 'gc')
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('c', 'p')
+      t.setEdge('o', 'gc').setEdge('gc', 'c', { cutvalue: 3 }).setEdge('c', 'p')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(6)
     })
 
     it('works for 4-node tree with gc -> c <- p -> o, with o <- c', function () {
-      g
-        .setEdge('gc', 'c')
+      g.setEdge('gc', 'c')
         .setEdge('p', 'c')
         .setEdge('p', 'o')
         .setEdge('c', 'o', { weight: 7 })
-      t
-        .setEdge('o', 'gc')
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('c', 'p')
+      t.setEdge('o', 'gc').setEdge('gc', 'c', { cutvalue: 3 }).setEdge('c', 'p')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(-8)
     })
 
     it('works for 4-node tree with o -> gc -> c <- p, with o -> c', function () {
-      g
-        .setEdge('o', 'c', { weight: 7 })
+      g.setEdge('o', 'c', { weight: 7 })
         .setPath(['o', 'gc', 'c'])
         .setEdge('p', 'c')
-      t
-        .setEdge('o', 'gc')
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('c', 'p')
+      t.setEdge('o', 'gc').setEdge('gc', 'c', { cutvalue: 3 }).setEdge('c', 'p')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(6)
     })
 
     it('works for 4-node tree with o -> gc -> c <- p, with o <- c', function () {
-      g
-        .setEdge('c', 'o', { weight: 7 })
+      g.setEdge('c', 'o', { weight: 7 })
         .setPath(['o', 'gc', 'c'])
         .setEdge('p', 'c')
-      t
-        .setEdge('o', 'gc')
-        .setEdge('gc', 'c', { cutvalue: 3 })
-        .setEdge('c', 'p')
+      t.setEdge('o', 'gc').setEdge('gc', 'c', { cutvalue: 3 }).setEdge('c', 'p')
       initLowLimValues(t, 'p')
 
       expect(calcCutValue(t, g, 'c')).toEqual(-8)
@@ -487,11 +467,11 @@ describe('network simplex', function () {
   })
 })
 
-function ns(g) {
+function ns(g: Graph) {
   networkSimplex(g)
   normalizeRanks(g)
 }
 
-function undirectedEdge(e) {
+function undirectedEdge(e: Edge) {
   return e.v < e.w ? { v: e.v, w: e.w } : { v: e.w, w: e.v }
 }

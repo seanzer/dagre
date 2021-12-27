@@ -1,14 +1,13 @@
 'use strict'
 
-import { Edge, Graph } from 'graphlib'
+import { alg, Edge, Graph } from 'graphlib'
 
 import _ from 'lodash'
-const { feasibleTree } = require('./feasible-tree')
-const slack = require('./util').slack
-const initRank = require('./util').longestPath
-const preorder = require('graphlib').alg.preorder
-const postorder = require('graphlib').alg.postorder
-const simplify = require('../util').simplify
+import { feasibleTree } from './feasible-tree'
+import { slack, longestPath as initRank } from './util'
+import { simplify } from '../util'
+
+const { preorder, postorder } = alg
 
 // Expose some internals for testing purposes
 networkSimplex.initLowLimValues = initLowLimValues
@@ -28,7 +27,7 @@ networkSimplex.exchangeEdges = exchangeEdges
  *    2. All nodes in the graph must have an object value.
  *    3. All edges in the graph must have "minlen" and "weight" attributes.
  *
- * Postconditions:
+ * Post-conditions:
  *
  *    1. All nodes in the graph will have an assigned "rank" attribute that has
  *       been optimized by the network simplex algorithm. Ranks start at 0.
@@ -194,10 +193,10 @@ function enterEdge(t: Graph, g: Graph, edge: Edge) {
 
   return _.minBy(candidates, function (edge: Edge) {
     return slack(g, edge)
-  })
+  }) as Edge
 }
 
-function exchangeEdges(t: Graph, g: Graph, e: Edge, f: any) {
+function exchangeEdges(t: Graph, g: Graph, e: Edge, f: Edge) {
   const v = e.v
   const w = e.w
   t.removeEdge(v, w)
@@ -211,7 +210,7 @@ function updateRanks(t: Graph, g: Graph) {
   const root = _.find(t.nodes(), function (v: string) {
     return !g.node(v).parent
   })
-  let vs = preorder(t, root)
+  let vs = preorder(t, root ? [root] : [])
   vs = vs.slice(1)
   _.forEach(vs, function (v: string) {
     const parent = t.node(v).parent
@@ -239,6 +238,13 @@ function isTreeEdge(tree: Graph, u: string, v: string) {
  * Returns true if the specified node is descendant of the root node per the
  * assigned low and lim attributes in the tree.
  */
-function isDescendant(tree: Graph, vLabel: any, rootLabel: any) {
-  return rootLabel.low <= vLabel.lim && vLabel.lim <= rootLabel.lim
+function isDescendant(
+  tree: Graph,
+  vLabel: Record<string, unknown>,
+  rootLabel: Record<string, unknown>
+) {
+  return (
+    (rootLabel.low as number) <= (vLabel.lim as number) &&
+    (vLabel.lim as number) <= (rootLabel.lim as number)
+  )
 }

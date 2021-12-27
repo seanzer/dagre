@@ -1,19 +1,25 @@
+import { Graph } from 'graphlib'
 import _ from 'lodash'
-const {rank} = require('../../lib/rank')
-const Graph = require('graphlib').Graph
+import { rank } from '../../lib/rank'
 
 describe('rank', function () {
   const RANKERS = [
-    'longest-path', 'tight-tree',
-    'network-simplex', 'unknown-should-still-work',
+    'longest-path',
+    'tight-tree',
+    'network-simplex',
+    'unknown-should-still-work',
   ]
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph()
       .setGraph({})
-      .setDefaultNodeLabel(function () { return {} })
-      .setDefaultEdgeLabel(function () { return { minlen: 1, weight: 1 } })
+      .setDefaultNodeLabel(function () {
+        return {}
+      })
+      .setDefaultEdgeLabel(function () {
+        return { minlen: 1, weight: 1 }
+      })
       .setPath(['a', 'b', 'c', 'd', 'h'])
       .setPath(['a', 'e', 'g', 'h'])
       .setPath(['a', 'f', 'g'])
@@ -22,7 +28,8 @@ describe('rank', function () {
   _.forEach(RANKERS, function (ranker) {
     describe(ranker, function () {
       it('respects the minlen attribute', function () {
-        g.graph().ranker = ranker
+        // eslint-disable-next-line @typescript-eslint/no-extra-semi
+        ;(g.graph() as unknown as Record<string, string>).ranker = ranker
         rank(g)
         _.forEach(g.edges(), function (e) {
           const vRank = g.node(e.v).rank
@@ -32,8 +39,12 @@ describe('rank', function () {
       })
 
       it('can rank a single node graph', function () {
-        const g = new Graph().setGraph({}).setNode('a', {})
-        rank(g, ranker)
+        const g = new Graph()
+          .setGraph({
+            ranker,
+          })
+          .setNode('a', {})
+        rank(g)
         expect(g.node('a').rank).toEqual(0)
       })
     })
