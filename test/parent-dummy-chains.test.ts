@@ -1,8 +1,12 @@
-const Graph = require('graphlib').Graph
-const { parentDummyChains } = require('../lib/parent-dummy-chains')
+import { parentDummyChains } from '@dagre/parent-dummy-chains'
+import { Graph } from 'graphlib'
 
 describe('parentDummyChains', function () {
-  let g
+  let g: Graph
+
+  function getGraphLabel() {
+    return g.graph() as unknown as { dummyChains: string[] }
+  }
 
   beforeEach(function () {
     g = new Graph({ compound: true }).setGraph({})
@@ -12,7 +16,7 @@ describe('parentDummyChains', function () {
     g.setNode('a')
     g.setNode('b')
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' } })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'b'])
 
     parentDummyChains(g)
@@ -23,7 +27,7 @@ describe('parentDummyChains', function () {
     g.setParent('a', 'sg1')
     g.setNode('sg1', { minRank: 0, maxRank: 2 })
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 2 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'b'])
 
     parentDummyChains(g)
@@ -34,7 +38,7 @@ describe('parentDummyChains', function () {
     g.setParent('b', 'sg1')
     g.setNode('sg1', { minRank: 1, maxRank: 3 })
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 1 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'b'])
 
     parentDummyChains(g)
@@ -47,7 +51,7 @@ describe('parentDummyChains', function () {
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 2 })
     g.setNode('d2', { rank: 3 })
     g.setNode('d3', { rank: 4 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'd2', 'd3', 'b'])
 
     parentDummyChains(g)
@@ -62,7 +66,7 @@ describe('parentDummyChains', function () {
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 1 })
     g.setNode('d2', { rank: 2 })
     g.setNode('d3', { rank: 3 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'd2', 'd3', 'b'])
 
     parentDummyChains(g)
@@ -84,7 +88,7 @@ describe('parentDummyChains', function () {
       g.setNode('d' + (i + 1), { rank: i + 3 })
     }
     g.node('d1').edgeObj = { v: 'a', w: 'b' }
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'd2', 'd3', 'd4', 'd5', 'b'])
 
     parentDummyChains(g)
@@ -103,7 +107,7 @@ describe('parentDummyChains', function () {
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 2 })
     g.setNode('d2', { rank: 3 })
     g.setNode('d3', { rank: 4 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'd2', 'd3', 'b'])
 
     parentDummyChains(g)
@@ -120,7 +124,7 @@ describe('parentDummyChains', function () {
     g.setNode('sg2', { minRank: 3, maxRank: 5 })
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 2 })
     g.setNode('d2', { rank: 3 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'd2', 'b'])
 
     parentDummyChains(g)
@@ -136,7 +140,7 @@ describe('parentDummyChains', function () {
     g.setNode('sg2', { minRank: 1, maxRank: 3 })
     g.setNode('d1', { edgeObj: { v: 'a', w: 'b' }, rank: 3 })
     g.setNode('d2', { rank: 4 })
-    g.graph().dummyChains = ['d1']
+    getGraphLabel().dummyChains = ['d1']
     g.setPath(['a', 'd1', 'd2', 'b'])
 
     parentDummyChains(g)

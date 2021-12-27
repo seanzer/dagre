@@ -1,8 +1,8 @@
-const {addBorderSegments} = require('../lib/add-border-segments')
-const Graph = require('graphlib').Graph
+import { addBorderSegments } from '@dagre/add-border-segments'
+import { Graph } from 'graphlib'
 
 describe('addBorderSegments', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph({ compound: true })

@@ -1,10 +1,9 @@
+import { greedyFAS } from '@dagre/greedy-fas'
+import { Graph, alg, Edge } from 'graphlib'
 import _ from 'lodash'
-const Graph = require('graphlib').Graph
-const findCycles = require('graphlib').alg.findCycles
-const {greedyFAS} = require('../lib/greedy-fas')
 
 describe('greedyFAS', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph()
@@ -88,21 +87,21 @@ describe('greedyFAS', function () {
   })
 })
 
-function checkFAS(g, fas) {
+function checkFAS(g: Graph, fas: Edge[]) {
   const n = g.nodeCount()
   const m = g.edgeCount()
   _.forEach(fas, function (edge) {
     g.removeEdge(edge.v, edge.w)
   })
-  expect(findCycles(g)).toEqual([])
+  expect(alg.findCycles(g)).toEqual([])
   // The more direct m/2 - n/6 fails for the simple cycle A <-> B, where one
   // edge must be reversed, but the performance bound implies that only 2/3rds
   // of an edge can be reversed. I'm using floors to acount for this.
   expect(fas.length).toBeLessThanOrEqual(Math.floor(m / 2) - Math.floor(n / 6))
 }
 
-function weightFn(g) {
-  return function (e) {
+function weightFn(g: Graph) {
+  return function (e: Edge) {
     return g.edge(e)
   }
 }

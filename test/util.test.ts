@@ -1,12 +1,12 @@
-/* eslint "no-console": off */
-
+import { Graph } from 'graphlib'
 import _ from 'lodash'
-const Graph = require('graphlib').Graph
-const util = require('../lib/util')
+import * as util from '@dagre/util'
+import { Rect } from '@dagre/rect'
+import { Point } from '@dagre/point'
 
 describe('util', function () {
   describe('simplify', function () {
-    let g
+    let g: Graph
 
     beforeEach(function () {
       g = new Graph({ multigraph: true })
@@ -31,12 +31,12 @@ describe('util', function () {
     it('copies the graph object', function () {
       g.setGraph({ foo: 'bar' })
       const g2 = util.simplify(g)
-      expect(g2.graph()).toEqual({ foo: 'bar' })
+      expect(g2.graph() as unknown).toEqual({ foo: 'bar' })
     })
   })
 
   describe('asNonCompoundGraph', function () {
-    let g
+    let g: Graph
 
     beforeEach(function () {
       g = new Graph({ compound: true, multigraph: true })
@@ -61,14 +61,14 @@ describe('util', function () {
     it('does not copy compound nodes', function () {
       g.setParent('a', 'sg1')
       const g2 = util.asNonCompoundGraph(g)
-      expect(g2.parent(g)).toBeUndefined()
+      expect(g2.parent('sg1')).toBeUndefined()
       expect(g2.isCompound()).toBeFalse()
     })
 
     it('copies the graph object', function () {
       g.setGraph({ foo: 'bar' })
       const g2 = util.asNonCompoundGraph(g)
-      expect(g2.graph()).toEqual({ foo: 'bar' })
+      expect(g2.graph() as unknown).toEqual({ foo: 'bar' })
     })
   })
 
@@ -101,7 +101,7 @@ describe('util', function () {
   })
 
   describe('intersectRect', function () {
-    function expectIntersects(rect, point) {
+    function expectIntersects(rect: Rect, point: Point) {
       const cross = util.intersectRect(rect, point)
       if (cross.x !== point.x) {
         const m = (cross.y - point.y) / (cross.x - point.x)
@@ -109,7 +109,7 @@ describe('util', function () {
       }
     }
 
-    function expectTouchesBorder(rect, point) {
+    function expectTouchesBorder(rect: Rect, point: Point) {
       const cross = util.intersectRect(rect, point)
       if (Math.abs(rect.x - cross.x) !== rect.width / 2) {
         expect(Math.abs(rect.y - cross.y)).toEqual(rect.height / 2)
@@ -138,7 +138,9 @@ describe('util', function () {
 
     it('throws an error if the point is at the center of the rectangle', function () {
       const rect = { x: 0, y: 0, width: 1, height: 1 }
-      expect(function () { util.intersectRect(rect, { x: 0, y: 0 }) }).toThrow()
+      expect(function () {
+        util.intersectRect(rect, { x: 0, y: 0 })
+      }).toThrow()
     })
   })
 
@@ -151,35 +153,24 @@ describe('util', function () {
       g.setNode('d', { rank: 1, order: 1 })
       g.setNode('e', { rank: 2, order: 0 })
 
-      expect(util.buildLayerMatrix(g)).toEqual([
-        ['a', 'b'],
-        ['c', 'd'],
-        ['e'],
-      ])
+      expect(util.buildLayerMatrix(g)).toEqual([['a', 'b'], ['c', 'd'], ['e']])
     })
   })
 
   describe('time', function () {
-    let consoleLog
-
-    beforeEach(function () {
-      consoleLog = console.log
-    })
-
-    afterEach(function () {
-      console.log = consoleLog
-    })
-
     it('logs timing information', function () {
-      const capture = []
-      console.log = function () { capture.push(_.toArray(arguments)[0]) }
+      const capture: string[] = []
+      spyOn(console, 'log').and.callFake((...args) => {
+        capture.push(_.toArray(args)[0])
+      })
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       util.time('foo', function () {})
       expect(capture.length).toEqual(1)
       expect(capture[0]).toMatch(/^foo time: .*ms/)
     })
 
     it('returns the value from the evaluated function', function () {
-      console.log = function () {}
+      spyOn(console, 'log').and.stub()
       expect(util.time('foo', _.constant('bar'))).toEqual('bar')
     })
   })
@@ -217,7 +208,9 @@ describe('util', function () {
 
       util.normalizeRanks(g)
 
-      expect(g.node('sg')).not.toEqual(jasmine.objectContaining({ rank: jasmine.anything() }))
+      expect(g.node('sg')).not.toEqual(
+        jasmine.objectContaining({ rank: jasmine.anything() })
+      )
       expect(g.node('a').rank).toEqual(0)
     })
   })

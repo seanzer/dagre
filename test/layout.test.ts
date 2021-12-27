@@ -1,14 +1,16 @@
+import { Graph } from 'graphlib'
 import _ from 'lodash'
-const layout = require('../lib/layout').layout
-const Graph = require('graphlib').Graph
+import { layout } from '@dagre/layout'
 
 describe('layout', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph({ multigraph: true, compound: true })
       .setGraph({})
-      .setDefaultEdgeLabel(function () { return {} })
+      .setDefaultEdgeLabel(function () {
+        return {}
+      })
   })
 
   it('can layout a single node', function () {
@@ -22,7 +24,8 @@ describe('layout', function () {
   })
 
   it('can layout two nodes on the same rank', function () {
-    g.graph().nodesep = 200
+    const graph = g.graph() as unknown as { nodesep: number }
+    graph.nodesep = 200
     g.setNode('a', { width: 50, height: 100 })
     g.setNode('b', { width: 75, height: 200 })
     layout(g)
@@ -33,7 +36,8 @@ describe('layout', function () {
   })
 
   it('can layout two nodes connected by an edge', function () {
-    g.graph().ranksep = 300
+    const graph = g.graph() as unknown as { ranksep: number }
+    graph.ranksep = 300
     g.setNode('a', { width: 50, height: 100 })
     g.setNode('b', { width: 75, height: 200 })
     g.setEdge('a', 'b')
@@ -44,12 +48,17 @@ describe('layout', function () {
     })
 
     // We should not get x, y coordinates if the edge has no label
-    expect(g.edge('a', 'b')).not.toEqual(jasmine.objectContaining({ x: jasmine.anything() }))
-    expect(g.edge('a', 'b')).not.toEqual(jasmine.objectContaining({ y: jasmine.anything() }))
+    expect(g.edge('a', 'b')).not.toEqual(
+      jasmine.objectContaining({ x: jasmine.anything() })
+    )
+    expect(g.edge('a', 'b')).not.toEqual(
+      jasmine.objectContaining({ y: jasmine.anything() })
+    )
   })
 
   it('can layout an edge with a label', function () {
-    g.graph().ranksep = 300
+    const graph = g.graph() as unknown as { ranksep: number }
+    graph.ranksep = 300
     g.setNode('a', { width: 50, height: 100 })
     g.setNode('b', { width: 75, height: 200 })
     g.setEdge('a', 'b', { width: 60, height: 70, labelpos: 'c' })
@@ -58,15 +67,22 @@ describe('layout', function () {
       a: { x: 75 / 2, y: 100 / 2 },
       b: { x: 75 / 2, y: 100 + 150 + 70 + 150 + 200 / 2 },
     })
-    expect(_.pick(g.edge('a', 'b'), ['x', 'y']))
-      .toEqual({ x: 75 / 2, y: 100 + 150 + 70 / 2 })
+    expect(_.pick(g.edge('a', 'b'), ['x', 'y'])).toEqual({
+      x: 75 / 2,
+      y: 100 + 150 + 70 / 2,
+    })
   })
 
   describe('can layout an edge with a long label, with rankdir =', function () {
     _.forEach(['TB', 'BT', 'LR', 'RL'], function (rankdir) {
       it(rankdir, function () {
-        g.graph().nodesep = g.graph().edgesep = 10
-        g.graph().rankdir = rankdir
+        const graph = g.graph() as unknown as {
+          nodesep: number
+          edgesep: number
+          rankdir: string
+        }
+        graph.nodesep = graph.edgesep = 10
+        graph.rankdir = rankdir
         _.forEach(['a', 'b', 'c', 'd'], function (v) {
           g.setNode(v, { width: 10, height: 10 })
         })
@@ -91,40 +107,64 @@ describe('layout', function () {
   describe('can apply an offset, with rankdir =', function () {
     _.forEach(['TB', 'BT', 'LR', 'RL'], function (rankdir) {
       it(rankdir, function () {
-        g.graph().nodesep = g.graph().edgesep = 10
-        g.graph().rankdir = rankdir
+        const graph = g.graph() as unknown as {
+          nodesep: number
+          edgesep: number
+          rankdir: string
+        }
+        graph.nodesep = graph.edgesep = 10
+        graph.rankdir = rankdir
         _.forEach(['a', 'b', 'c', 'd'], function (v) {
           g.setNode(v, { width: 10, height: 10 })
         })
-        g.setEdge('a', 'b', { width: 10, height: 10, labelpos: 'l', labeloffset: 1000 })
-        g.setEdge('c', 'd', { width: 10, height: 10, labelpos: 'r', labeloffset: 1000 })
+        g.setEdge('a', 'b', {
+          width: 10,
+          height: 10,
+          labelpos: 'l',
+          labeloffset: 1000,
+        })
+        g.setEdge('c', 'd', {
+          width: 10,
+          height: 10,
+          labelpos: 'r',
+          labeloffset: 1000,
+        })
         layout(g)
 
         if (rankdir === 'TB' || rankdir === 'BT') {
-          expect(g.edge('a', 'b').x - g.edge('a', 'b').points[0].x).toEqual(-1000 - 10 / 2)
-          expect(g.edge('c', 'd').x - g.edge('c', 'd').points[0].x).toEqual(1000 + 10 / 2)
+          expect(g.edge('a', 'b').x - g.edge('a', 'b').points[0].x).toEqual(
+            -1000 - 10 / 2
+          )
+          expect(g.edge('c', 'd').x - g.edge('c', 'd').points[0].x).toEqual(
+            1000 + 10 / 2
+          )
         } else {
-          expect(g.edge('a', 'b').y - g.edge('a', 'b').points[0].y).toEqual(-1000 - 10 / 2)
-          expect(g.edge('c', 'd').y - g.edge('c', 'd').points[0].y).toEqual(1000 + 10 / 2)
+          expect(g.edge('a', 'b').y - g.edge('a', 'b').points[0].y).toEqual(
+            -1000 - 10 / 2
+          )
+          expect(g.edge('c', 'd').y - g.edge('c', 'd').points[0].y).toEqual(
+            1000 + 10 / 2
+          )
         }
       })
     })
   })
 
   it('can layout a long edge with a label', function () {
-    g.graph().ranksep = 300
+    const graph = g.graph() as unknown as Record<'ranksep', number>
+    graph.ranksep = 300
     g.setNode('a', { width: 50, height: 100 })
     g.setNode('b', { width: 75, height: 200 })
     g.setEdge('a', 'b', { width: 60, height: 70, minlen: 2, labelpos: 'c' })
     layout(g)
     expect(g.edge('a', 'b').x).toEqual(75 / 2)
-    expect(g.edge('a', 'b').y)
-      .toBeGreaterThan(g.node('a').y)
+    expect(g.edge('a', 'b').y).toBeGreaterThan(g.node('a').y)
     expect(g.edge('a', 'b').y).toBeLessThan(g.node('b').y)
   })
 
   it('can layout out a short cycle', function () {
-    g.graph().ranksep = 200
+    const graph = g.graph() as unknown as Record<'ranksep', number>
+    graph.ranksep = 200
     g.setNode('a', { width: 100, height: 100 })
     g.setNode('b', { width: 100, height: 100 })
     g.setEdge('a', 'b', { weight: 2 })
@@ -135,12 +175,17 @@ describe('layout', function () {
       b: { x: 100 / 2, y: 100 + 200 + 100 / 2 },
     })
     // One arrow should point down, one up
-    expect(g.edge('a', 'b').points[1].y).toBeGreaterThan(g.edge('a', 'b').points[0].y)
-    expect(g.edge('b', 'a').points[0].y).toBeGreaterThan(g.edge('b', 'a').points[1].y)
+    expect(g.edge('a', 'b').points[1].y).toBeGreaterThan(
+      g.edge('a', 'b').points[0].y
+    )
+    expect(g.edge('b', 'a').points[0].y).toBeGreaterThan(
+      g.edge('b', 'a').points[1].y
+    )
   })
 
   it('adds rectangle intersects for edges', function () {
-    g.graph().ranksep = 200
+    const graph = g.graph() as unknown as Record<'ranksep', number>
+    graph.ranksep = 200
     g.setNode('a', { width: 100, height: 100 })
     g.setNode('b', { width: 100, height: 100 })
     g.setEdge('a', 'b')
@@ -155,7 +200,8 @@ describe('layout', function () {
   })
 
   it('adds rectangle intersects for edges spanning multiple ranks', function () {
-    g.graph().ranksep = 200
+    const graph = g.graph() as unknown as Record<'ranksep', number>
+    graph.ranksep = 200
     g.setNode('a', { width: 100, height: 100 })
     g.setNode('b', { width: 100, height: 100 })
     g.setEdge('a', 'b', { minlen: 2 })
@@ -174,8 +220,12 @@ describe('layout', function () {
   describe('can layout a self loop', function () {
     _.forEach(['TB', 'BT', 'LR', 'RL'], function (rankdir) {
       it('in rankdir = ' + rankdir, function () {
-        g.graph().edgesep = 75
-        g.graph().rankdir = rankdir
+        const graph = g.graph() as unknown as {
+          edgesep: number
+          rankdir: string
+        }
+        graph.edgesep = 75
+        graph.rankdir = rankdir
         g.setNode('a', { width: 100, height: 100 })
         g.setEdge('a', 'a', { width: 50, height: 50 })
         layout(g)
@@ -185,10 +235,14 @@ describe('layout', function () {
         _.forEach(points, function (point) {
           if (rankdir !== 'LR' && rankdir !== 'RL') {
             expect(point.x).toBeGreaterThan(nodeA.x)
-            expect(Math.abs(point.y - nodeA.y)).toBeLessThanOrEqual(nodeA.height / 2)
+            expect(Math.abs(point.y - nodeA.y)).toBeLessThanOrEqual(
+              nodeA.height / 2
+            )
           } else {
             expect(point.y).toBeGreaterThan(nodeA.y)
-            expect(Math.abs(point.x - nodeA.x)).toBeLessThanOrEqual(nodeA.width / 2)
+            expect(Math.abs(point.x - nodeA.x)).toBeLessThanOrEqual(
+              nodeA.width / 2
+            )
           }
         })
       })
@@ -225,60 +279,85 @@ describe('layout', function () {
     g.setNode('sg', {})
     g.setParent('a', 'sg')
 
-    function check(rankdir) {
-      expect(g.node('sg').width, 'width ' + rankdir).toBeGreaterThan(50)
-      expect(g.node('sg').height, 'height ' + rankdir).toBeGreaterThan(50)
-      expect(g.node('sg').x, 'x ' + rankdir).toBeGreaterThan(50 / 2)
-      expect(g.node('sg').y, 'y ' + rankdir).toBeGreaterThan(50 / 2)
+    function check(rankdir: 'tb' | 'bt' | 'lr' | 'rl') {
+      expect(g.node('sg').width)
+        .withContext('width ' + rankdir)
+        .toBeGreaterThan(50)
+      expect(g.node('sg').height)
+        .withContext('height ' + rankdir)
+        .toBeGreaterThan(50)
+      expect(g.node('sg').x)
+        .withContext('x ' + rankdir)
+        .toBeGreaterThan(50 / 2)
+      expect(g.node('sg').y)
+        .withContext('y ' + rankdir)
+        .toBeGreaterThan(50 / 2)
     }
 
-    _.forEach(['tb', 'bt', 'lr', 'rl'], function (rankdir) {
-      g.graph().rankdir = rankdir
-      layout(g)
-      check(rankdir)
-    })
+    _.forEach(
+      ['tb', 'bt', 'lr', 'rl'],
+      function (rankdir: 'tb' | 'bt' | 'lr' | 'rl') {
+        const graph = g.graph() as unknown as {
+          rankdir: 'tb' | 'bt' | 'lr' | 'rl'
+        }
+        graph.rankdir = rankdir
+        layout(g)
+        check(rankdir)
+      }
+    )
   })
 
   it('adds dimensions to the graph', function () {
     g.setNode('a', { width: 100, height: 50 })
     layout(g)
-    expect(g.graph().width).toEqual(100)
-    expect(g.graph().height).toEqual(50)
+    const graph = g.graph() as unknown as { width: number; height: number }
+    expect(graph.width).toEqual(100)
+    expect(graph.height).toEqual(50)
   })
 
   describe('ensures all coordinates are in the bounding box for the graph', function () {
-    _.forEach(['TB', 'BT', 'LR', 'RL'], function (rankdir) {
-      describe(rankdir, function () {
-        beforeEach(function () {
-          g.graph().rankdir = rankdir
-        })
-
-        it('node', function () {
-          g.setNode('a', { width: 100, height: 200 })
-          layout(g)
-          expect(g.node('a').x).toEqual(100 / 2)
-          expect(g.node('a').y).toEqual(200 / 2)
-        })
-
-        it('edge, labelpos = l', function () {
-          g.setNode('a', { width: 100, height: 100 })
-          g.setNode('b', { width: 100, height: 100 })
-          g.setEdge('a', 'b', {
-            width: 1000, height: 2000, labelpos: 'l', labeloffset: 0,
+    _.forEach(
+      ['TB', 'BT', 'LR', 'RL'],
+      function (rankdir: 'TB' | 'BT' | 'LR' | 'RL') {
+        describe(rankdir, function () {
+          beforeEach(function () {
+            const graph = g.graph() as unknown as {
+              rankdir: 'TB' | 'BT' | 'LR' | 'RL'
+            }
+            graph.rankdir = rankdir
           })
-          layout(g)
-          if (rankdir === 'TB' || rankdir === 'BT') {
-            expect(g.edge('a', 'b').x).toEqual(1000 / 2)
-          } else {
-            expect(g.edge('a', 'b').y).toEqual(2000 / 2)
-          }
+
+          it('node', function () {
+            g.setNode('a', { width: 100, height: 200 })
+            layout(g)
+            expect(g.node('a').x).toEqual(100 / 2)
+            expect(g.node('a').y).toEqual(200 / 2)
+          })
+
+          it('edge, labelpos = l', function () {
+            g.setNode('a', { width: 100, height: 100 })
+            g.setNode('b', { width: 100, height: 100 })
+            g.setEdge('a', 'b', {
+              width: 1000,
+              height: 2000,
+              labelpos: 'l',
+              labeloffset: 0,
+            })
+            layout(g)
+            if (rankdir === 'TB' || rankdir === 'BT') {
+              expect(g.edge('a', 'b').x).toEqual(1000 / 2)
+            } else {
+              expect(g.edge('a', 'b').y).toEqual(2000 / 2)
+            }
+          })
         })
-      })
-    })
+      }
+    )
   })
 
   it('treats attributes with case-insensitivity', function () {
-    g.graph().nodeSep = 200 // note the capital S
+    const graph = g.graph() as unknown as { nodeSep: number }
+    graph.nodeSep = 200 // note the capital S
     g.setNode('a', { width: 50, height: 100 })
     g.setNode('b', { width: 75, height: 200 })
     layout(g)
@@ -289,9 +368,12 @@ describe('layout', function () {
   })
 })
 
-function extractCoordinates(g) {
+function extractCoordinates(g: Graph) {
   const nodes = g.nodes()
-  return _.zipObject(nodes, _.map(nodes, function (v) {
-    return _.pick(g.node(v), ['x', 'y'])
-  }))
+  return _.zipObject(
+    nodes,
+    _.map(nodes, function (v) {
+      return _.pick(g.node(v), ['x', 'y'])
+    })
+  )
 }

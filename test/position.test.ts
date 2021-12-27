@@ -1,20 +1,23 @@
-const { position } = require('../lib/position')
-const Graph = require('graphlib').Graph
+import { position } from '@dagre/position'
+import { Graph } from 'graphlib'
 
 describe('position', function () {
-  let g
+  let g: Graph
+
+  function getGraphLabel() {
+    return g.graph() as unknown as { ranksep: number; nodesep: number }
+  }
 
   beforeEach(function () {
-    g = new Graph({ compound: true })
-      .setGraph({
-        ranksep: 50,
-        nodesep: 50,
-        edgesep: 10,
-      })
+    g = new Graph({ compound: true }).setGraph({
+      ranksep: 50,
+      nodesep: 50,
+      edgesep: 10,
+    })
   })
 
   it('respects ranksep', function () {
-    g.graph().ranksep = 1000
+    getGraphLabel().ranksep = 1000
     g.setNode('a', { width: 50, height: 100, rank: 0, order: 0 })
     g.setNode('b', { width: 50, height: 80, rank: 1, order: 0 })
     g.setEdge('a', 'b')
@@ -23,7 +26,7 @@ describe('position', function () {
   })
 
   it('use the largest height in each rank with ranksep', function () {
-    g.graph().ranksep = 1000
+    getGraphLabel().ranksep = 1000
     g.setNode('a', { width: 50, height: 100, rank: 0, order: 0 })
     g.setNode('b', { width: 50, height: 80, rank: 0, order: 1 })
     g.setNode('c', { width: 50, height: 90, rank: 1, order: 0 })
@@ -35,7 +38,7 @@ describe('position', function () {
   })
 
   it('respects nodesep', function () {
-    g.graph().nodesep = 1000
+    getGraphLabel().nodesep = 1000
     g.setNode('a', { width: 50, height: 100, rank: 0, order: 0 })
     g.setNode('b', { width: 70, height: 80, rank: 0, order: 1 })
     position(g)
@@ -47,7 +50,11 @@ describe('position', function () {
     g.setNode('sg1', {})
     g.setParent('a', 'sg1')
     position(g)
-    expect(g.node('sg1')).not.toEqual(jasmine.objectContaining({ x: jasmine.anything() }))
-    expect(g.node('sg1')).not.toEqual(jasmine.objectContaining({ y: jasmine.anything() }))
+    expect(g.node('sg1')).not.toEqual(
+      jasmine.objectContaining({ x: jasmine.anything() })
+    )
+    expect(g.node('sg1')).not.toEqual(
+      jasmine.objectContaining({ y: jasmine.anything() })
+    )
   })
 })

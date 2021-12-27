@@ -23,7 +23,7 @@ import { longestPath } from './util'
  *       fix them up later.
  */
 export function rank(g: Graph) {
-  switch ((g.graph() as any).ranker) {
+  switch ((g.graph() as unknown as { ranker: string }).ranker) {
     case 'network-simplex':
       networkSimplexRanker(g)
       break

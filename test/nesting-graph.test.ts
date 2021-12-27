@@ -1,14 +1,21 @@
-const Graph = require('graphlib').Graph
-const components = require('graphlib').alg.components
-const nestingGraph = require('../lib/nesting-graph')
+import { Graph, alg } from 'graphlib'
+import * as nestingGraph from '@dagre/nesting-graph'
+
+const { components } = alg
 
 describe('rank/nestingGraph', function () {
-  let g
+  let g: Graph
+
+  function getGraphLabel() {
+    return g.graph() as unknown as { nestingRoot: string }
+  }
 
   beforeEach(function () {
     g = new Graph({ compound: true })
       .setGraph({})
-      .setDefaultNodeLabel(function () { return {} })
+      .setDefaultNodeLabel(function () {
+        return {}
+      })
   })
 
   describe('run', function () {
@@ -33,11 +40,19 @@ describe('rank/nestingGraph', function () {
       expect(g.parent(borderTop)).toEqual('sg1')
       expect(g.parent(borderBottom)).toEqual('sg1')
       expect(g.outEdges(borderTop, 'a')).toHaveSize(1)
-      expect(g.edge(g.outEdges(borderTop, 'a')[0]).minlen).toEqual(1)
+      expect(g.edge(g.outEdges(borderTop, 'a')![0]).minlen).toEqual(1)
       expect(g.outEdges('a', borderBottom)).toHaveSize(1)
-      expect(g.edge(g.outEdges('a', borderBottom)[0]).minlen).toEqual(1)
-      expect(g.node(borderTop)).toEqual({ width: 0, height: 0, dummy: 'border' })
-      expect(g.node(borderBottom)).toEqual({ width: 0, height: 0, dummy: 'border' })
+      expect(g.edge(g.outEdges('a', borderBottom)![0]).minlen).toEqual(1)
+      expect(g.node(borderTop)).toEqual({
+        width: 0,
+        height: 0,
+        dummy: 'border',
+      })
+      expect(g.node(borderBottom)).toEqual({
+        width: 0,
+        height: 0,
+        dummy: 'border',
+      })
     })
 
     it('adds edges between borders of nested subgraphs', function () {
@@ -54,9 +69,9 @@ describe('rank/nestingGraph', function () {
       expect(sg2Top).toBeTruthy()
       expect(sg2Bottom).toBeTruthy()
       expect(g.outEdges(sg1Top, sg2Top)).toHaveSize(1)
-      expect(g.edge(g.outEdges(sg1Top, sg2Top)[0]).minlen).toEqual(1)
+      expect(g.edge(g.outEdges(sg1Top, sg2Top)![0]).minlen).toEqual(1)
       expect(g.outEdges(sg2Bottom, sg1Bottom)).toHaveSize(1)
-      expect(g.edge(g.outEdges(sg2Bottom, sg1Bottom)[0]).minlen).toEqual(1)
+      expect(g.edge(g.outEdges(sg2Bottom, sg1Bottom)![0]).minlen).toEqual(1)
     })
 
     it('adds sufficient weight to border to node edges', function () {
@@ -78,32 +93,38 @@ describe('rank/nestingGraph', function () {
       g.setParent('a', 'sg1')
       nestingGraph.run(g)
 
-      const root = g.graph().nestingRoot
+      const root = getGraphLabel().nestingRoot
       const borderTop = g.node('sg1').borderTop
       expect(root).toBeTruthy()
       expect(borderTop).toBeTruthy()
       expect(g.outEdges(root, borderTop)).toHaveSize(1)
-      expect(g.hasEdge(g.outEdges(root, borderTop)[0])).toBeTrue()
+      expect(g.hasEdge(g.outEdges(root, borderTop)![0])).toBeTrue()
     })
 
     it('adds an edge from root to each node with the correct minlen #1', function () {
       g.setNode('a')
       nestingGraph.run(g)
 
-      const root = g.graph().nestingRoot
+      const root = getGraphLabel().nestingRoot
       expect(root).toBeTruthy()
       expect(g.outEdges(root, 'a')).toHaveSize(1)
-      expect(g.edge(g.outEdges(root, 'a')[0])).toEqual({ weight: 0, minlen: 1 })
+      expect(g.edge(g.outEdges(root, 'a')![0])).toEqual({
+        weight: 0,
+        minlen: 1,
+      })
     })
 
     it('adds an edge from root to each node with the correct minlen #2', function () {
       g.setParent('a', 'sg1')
       nestingGraph.run(g)
 
-      const root = g.graph().nestingRoot
+      const root = getGraphLabel().nestingRoot
       expect(root).toBeTruthy()
       expect(g.outEdges(root, 'a')).toHaveSize(1)
-      expect(g.edge(g.outEdges(root, 'a')[0])).toEqual({ weight: 0, minlen: 3 })
+      expect(g.edge(g.outEdges(root, 'a')![0])).toEqual({
+        weight: 0,
+        minlen: 3,
+      })
     })
 
     it('adds an edge from root to each node with the correct minlen #3', function () {
@@ -111,17 +132,20 @@ describe('rank/nestingGraph', function () {
       g.setParent('a', 'sg2')
       nestingGraph.run(g)
 
-      const root = g.graph().nestingRoot
+      const root = getGraphLabel().nestingRoot
       expect(root).toBeTruthy()
       expect(g.outEdges(root, 'a')).toHaveSize(1)
-      expect(g.edge(g.outEdges(root, 'a')[0])).toEqual({ weight: 0, minlen: 5 })
+      expect(g.edge(g.outEdges(root, 'a')![0])).toEqual({
+        weight: 0,
+        minlen: 5,
+      })
     })
 
     it('does not add an edge from the root to itself', function () {
       g.setNode('a')
       nestingGraph.run(g)
 
-      const root = g.graph().nestingRoot
+      const root = getGraphLabel().nestingRoot
       expect(g.outEdges(root, root)).toEqual([])
     })
 
@@ -163,7 +187,7 @@ describe('rank/nestingGraph', function () {
       // 6: close sg2
       // 7: close sg1
 
-      const root = g.graph().nestingRoot
+      const root = getGraphLabel().nestingRoot
       const sg1Top = g.node('sg1').borderTop
       const sg1Bot = g.node('sg1').borderBottom
       const sg2Top = g.node('sg2').borderTop

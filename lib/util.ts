@@ -1,5 +1,7 @@
 import _ from 'lodash'
 import { Edge, Graph } from 'graphlib'
+import { Rect } from './rect'
+import { Point } from './point'
 
 /*
  * Adds a dummy node to the graph and return v.
@@ -7,7 +9,7 @@ import { Edge, Graph } from 'graphlib'
 export function addDummyNode(
   g: Graph,
   type: unknown,
-  attrs: { [key: string]: any },
+  attrs: Record<string, unknown>,
   name: string
 ) {
   let v: string
@@ -81,10 +83,7 @@ export function predecessorWeights(g: Graph) {
  * Finds where a line starting at point ({x, y}) would intersect a rectangle
  * ({x, y, width, height}) if it were pointing at the rectangle's center.
  */
-export function intersectRect(
-  rect: { x: number; y: number; width: number; height: number },
-  point: { x: number; y: number }
-) {
+export function intersectRect(rect: Rect, point: Point) {
   const x = rect.x
   const y = rect.y
 

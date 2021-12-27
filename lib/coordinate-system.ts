@@ -1,19 +1,11 @@
+import { Point } from '@dagre/point'
+import { Rect } from '@dagre/rect'
 import { Graph } from 'graphlib'
 import _ from 'lodash'
 
 export interface GraphRootLabel {
   rankdir?: string
   ranker?: string
-}
-
-interface Coordinate {
-  x: number
-  y: number
-}
-
-interface Box extends Coordinate {
-  width: number
-  height: number
 }
 
 export function adjust(g: Graph) {
@@ -44,7 +36,7 @@ function swapWidthHeight(g: Graph) {
   })
 }
 
-function swapWidthHeightOne(attrs: Box) {
+function swapWidthHeightOne(attrs: Rect) {
   const w = attrs.width
   attrs.width = attrs.height
   attrs.height = w
@@ -64,7 +56,7 @@ function reverseY(g: Graph) {
   })
 }
 
-function reverseYOne(attrs: Box) {
+function reverseYOne(attrs: Rect) {
   attrs.y = -attrs.y
 }
 
@@ -82,7 +74,7 @@ function swapXY(g: Graph) {
   })
 }
 
-function swapXYOne(attrs: Coordinate) {
+function swapXYOne(attrs: Point) {
   const x = attrs.x
   attrs.x = attrs.y
   attrs.y = x

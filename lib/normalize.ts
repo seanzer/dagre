@@ -4,6 +4,10 @@ import { Edge, Graph } from 'graphlib'
 import _ from 'lodash'
 import * as util from './util'
 
+function getGraphLabel(g: Graph) {
+  return g.graph() as unknown as { dummyChains: string[] }
+}
+
 /*
  * Breaks any long edges in the graph into short segments that span 1 layer
  * each. This operation is undoable with the denormalize function.
@@ -21,7 +25,7 @@ import * as util from './util'
  *       the first dummy in each chain of dummy nodes produced.
  */
 export function run(g: Graph) {
-  ;(g.graph() as any).dummyChains = []
+  getGraphLabel(g).dummyChains = []
   _.forEach(g.edges(), function (edge) {
     normalizeEdge(g, edge)
   })
@@ -59,7 +63,7 @@ function normalizeEdge(g: Graph, e: Edge) {
     }
     g.setEdge(v, dummy, { weight: edgeLabel.weight }, name)
     if (i === 0) {
-      ;(g.graph() as any).dummyChains.push(dummy)
+      getGraphLabel(g).dummyChains.push(dummy)
     }
     v = dummy
   }
@@ -68,14 +72,15 @@ function normalizeEdge(g: Graph, e: Edge) {
 }
 
 export function undo(g: Graph) {
-  _.forEach((g.graph() as any).dummyChains, function (v) {
+  _.forEach(getGraphLabel(g).dummyChains, function (v) {
     let node = g.node(v)
     const origLabel = node.edgeLabel
     let w
     g.setEdge(node.edgeObj, origLabel)
-    while (node.dummy) {
-      w = g.successors(v)?.[0]
-      g.removeNode(v)
+    let current: string | undefined = v
+    while (current && node.dummy) {
+      w = g.successors(current)?.[0]
+      g.removeNode(current)
       origLabel.points.push({ x: node.x, y: node.y })
       if (node.dummy === 'edge-label') {
         origLabel.x = node.x
@@ -83,8 +88,8 @@ export function undo(g: Graph) {
         origLabel.width = node.width
         origLabel.height = node.height
       }
-      v = w
-      node = g.node(v)
+      current = w
+      node = current ? g.node(current) : undefined
     }
   })
 }
