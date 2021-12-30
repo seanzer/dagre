@@ -8,7 +8,7 @@ export function sortSubgraph(
   g: Graph,
   v: string,
   cg: Graph,
-  biasRight: boolean
+  biasRight = false
 ) {
   let movable = g.children(v)
   const node = g.node(v)
@@ -58,7 +58,7 @@ export function sortSubgraph(
 }
 
 function expandSubgraphs(
-  entries: Pick<any, 'vs' | 'i' | 'barycenter' | 'weight'>[],
+  entries:Array<{vs: string[], i: number, barycenter?: number, weight?: number}>,
   subgraphs: { [x: string]: { vs: any } }
 ) {
   _.forEach(entries, function (entry) {

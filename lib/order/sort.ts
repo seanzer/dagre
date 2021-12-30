@@ -2,8 +2,8 @@ import _ from 'lodash'
 import * as util from '@dagre/util'
 
 export function sort(
-  entries: Pick<any, 'barycenter' | 'weight' | 'vs' | 'i'>[],
-  biasRight: boolean
+  entries: Array<{barycenter?: number, i: number, vs: string[], weight?: number}>,
+  biasRight = false
 ) {
   const parts = util.partition(entries, function (entry: any) {
     return _.has(entry, 'barycenter')

@@ -24,5 +24,6 @@ import { time, notime } from './lib/util'
 import libVersion from './lib/version'
 
 export { layout } from './lib/layout'
+export { rank } from './lib/rank'
 export const util = { time, notime }
 export const version = libVersion

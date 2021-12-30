@@ -3,7 +3,7 @@ import { Graph } from 'graphlib'
 import { initOrder } from '../../lib/order/init-order'
 
 describe('order/initOrder', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph({ compound: true }).setDefaultEdgeLabel(function () {

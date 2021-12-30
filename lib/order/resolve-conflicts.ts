@@ -99,7 +99,7 @@ function doResolveConflicts(sourceSet: any[]) {
     function (entry) {
       return _.pick(entry, ['vs', 'i', 'barycenter', 'weight'])
     }
-  )
+  ) as Array<{ vs: string[], i: number, barycenter?: number, weight?: number}>
 }
 
 function mergeEntries(target: any, source: any) {

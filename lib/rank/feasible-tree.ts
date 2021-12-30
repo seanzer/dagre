@@ -53,7 +53,7 @@ export function feasibleTree(g: Graph) {
  */
 function tightTree(t: Graph, g: Graph) {
   function dfs(v: string) {
-    _.forEach(g.nodeEdges(v), (e: any) => {
+    _.forEach(g.nodeEdges(v) ?? [], (e: any) => {
       const edgeV = e.v as any
       const w = v === edgeV ? e.w : edgeV
       if (!t.hasNode(w) && !slack(g, e)) {

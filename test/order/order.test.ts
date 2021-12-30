@@ -5,7 +5,7 @@ import * as util from '../../lib/util'
 import { crossCount } from '../../lib/order/cross-count'
 
 describe('order', function () {
-  let g
+  let g: Graph
 
   beforeEach(function () {
     g = new Graph().setDefaultEdgeLabel({ weight: 1 })

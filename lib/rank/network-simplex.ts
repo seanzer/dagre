@@ -102,7 +102,7 @@ function calcCutValue(t: Graph, g: Graph, child: string) {
 
   cutValue = graphEdge.weight
 
-  _.forEach(g.nodeEdges(child), function (e: Edge) {
+  _.forEach(g.nodeEdges(child) ?? [], function (e: Edge) {
     const isOutEdge = e.v === child
     const other = isOutEdge ? e.w : e.v
 
@@ -136,7 +136,7 @@ function dfsAssignLowLim(
   const label = tree.node(v)
 
   visited[v] = true
-  _.forEach(tree.neighbors(v), function (w: string) {
+  _.forEach(tree.neighbors(v) ?? [], function (w: string) {
     if (!_.has(visited, w)) {
       nextLim = dfsAssignLowLim(tree, visited, nextLim, w, v)
     }

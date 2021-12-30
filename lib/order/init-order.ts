@@ -31,7 +31,7 @@ export function initOrder(g: Graph) {
     visited[v] = true
     const node = g.node(v)
     layers[node.rank].push(v)
-    _.forEach(g.successors(v), dfs)
+    _.forEach(g.successors(v) ?? [], dfs)
   }
 
   const orderedVs = _.sortBy(simpleNodes, function (v) {

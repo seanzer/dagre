@@ -1,9 +1,10 @@
 import _ from 'lodash'
 import { Graph } from 'graphlib'
-const { sortSubgraph } = require('../../lib/order/sort-subgraph')
+import { sortSubgraph } from '../../lib/order/sort-subgraph'
 
 describe('order/sortSubgraph', function () {
-  let g, cg
+  let g: Graph
+  let cg: Graph
 
   beforeEach(function () {
     g = new Graph({ compound: true })
@@ -14,15 +15,15 @@ describe('order/sortSubgraph', function () {
         return { weight: 1 }
       })
     _.forEach(_.range(5), function (v) {
-      g.setNode(v, { order: v })
+      g.setNode(String(v), { order: v })
     })
     cg = new Graph()
   })
 
   it('sorts a flat subgraph based on barycenter', function () {
-    g.setEdge(3, 'x')
-    g.setEdge(1, 'y', { weight: 2 })
-    g.setEdge(4, 'y')
+    g.setEdge('3', 'x')
+    g.setEdge('1', 'y', { weight: 2 })
+    g.setEdge('4', 'y')
     _.forEach(['x', 'y'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -31,10 +32,10 @@ describe('order/sortSubgraph', function () {
   })
 
   it('preserves the pos of a node (y) w/o neighbors in a flat subgraph', function () {
-    g.setEdge(3, 'x')
+    g.setEdge('3', 'x')
     g.setNode('y')
-    g.setEdge(1, 'z', { weight: 2 })
-    g.setEdge(4, 'z')
+    g.setEdge('1', 'z', { weight: 2 })
+    g.setEdge('4', 'z')
     _.forEach(['x', 'y', 'z'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -43,8 +44,8 @@ describe('order/sortSubgraph', function () {
   })
 
   it('biases to the left without reverse bias', function () {
-    g.setEdge(1, 'x')
-    g.setEdge(1, 'y')
+    g.setEdge('1', 'x')
+    g.setEdge('1', 'y')
     _.forEach(['x', 'y'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -53,8 +54,8 @@ describe('order/sortSubgraph', function () {
   })
 
   it('biases to the right with reverse bias', function () {
-    g.setEdge(1, 'x')
-    g.setEdge(1, 'y')
+    g.setEdge('1', 'x')
+    g.setEdge('1', 'y')
     _.forEach(['x', 'y'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -63,9 +64,9 @@ describe('order/sortSubgraph', function () {
   })
 
   it('aggregates stats about the subgraph', function () {
-    g.setEdge(3, 'x')
-    g.setEdge(1, 'y', { weight: 2 })
-    g.setEdge(4, 'y')
+    g.setEdge('3', 'x')
+    g.setEdge('1', 'y', { weight: 2 })
+    g.setEdge('4', 'y')
     _.forEach(['x', 'y'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -80,9 +81,9 @@ describe('order/sortSubgraph', function () {
     g.setParent('a', 'y')
     g.setParent('b', 'y')
     g.setParent('c', 'y')
-    g.setEdge(0, 'x')
-    g.setEdge(1, 'z')
-    g.setEdge(2, 'y')
+    g.setEdge('0', 'x')
+    g.setEdge('1', 'z')
+    g.setEdge('2', 'y')
     _.forEach(['x', 'y', 'z'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -95,10 +96,10 @@ describe('order/sortSubgraph', function () {
     g.setParent('a', 'y')
     g.setParent('b', 'y')
     g.setParent('c', 'y')
-    g.setEdge(0, 'a', { weight: 3 })
-    g.setEdge(0, 'x')
-    g.setEdge(1, 'z')
-    g.setEdge(2, 'y')
+    g.setEdge('0', 'a', { weight: 3 })
+    g.setEdge('0', 'x')
+    g.setEdge('1', 'z')
+    g.setEdge('2', 'y')
     _.forEach(['x', 'y', 'z'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -111,10 +112,10 @@ describe('order/sortSubgraph', function () {
     g.setParent('a', 'y')
     g.setParent('b', 'y')
     g.setParent('c', 'y')
-    g.setEdge(0, 'a')
-    g.setEdge(1, 'b')
-    g.setEdge(0, 'x')
-    g.setEdge(1, 'z')
+    g.setEdge('0', 'a')
+    g.setEdge('1', 'b')
+    g.setEdge('0', 'x')
+    g.setEdge('1', 'z')
     _.forEach(['x', 'y', 'z'], function (v) {
       g.setParent(v, 'movable')
     })
@@ -123,9 +124,9 @@ describe('order/sortSubgraph', function () {
   })
 
   it('sorts border nodes to the extremes of the subgraph', function () {
-    g.setEdge(0, 'x')
-    g.setEdge(1, 'y')
-    g.setEdge(2, 'z')
+    g.setEdge('0', 'x')
+    g.setEdge('1', 'y')
+    g.setEdge('2', 'z')
     g.setNode('sg1', { borderLeft: 'bl', borderRight: 'br' })
     _.forEach(['x', 'y', 'z', 'bl', 'br'], function (v) {
       g.setParent(v, 'sg1')

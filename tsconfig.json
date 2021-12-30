@@ -1,11 +1,12 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "declaration": true,
-    "outDir": "./out",
-    "noEmit": false,
-    "isolatedModules": false,
-    "importHelpers": true
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "noEmit": false
   },
   "files": [
     "index.ts"

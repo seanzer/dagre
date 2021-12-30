@@ -34,7 +34,7 @@ function dfsFAS(g: Graph) {
     }
     visited[v] = true
     stack[v] = true
-    _.forEach(g.outEdges(v), (e: Edge) => {
+    _.forEach(g.outEdges(v) ?? [], (e: Edge) => {
       if (_.has(stack, e.w)) {
         fas.push(e)
       } else {

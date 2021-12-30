@@ -206,7 +206,7 @@ describe('normalize', function () {
 
       normalize.run(g)
 
-      const outEdges = _.sortBy(g.outEdges('a'), 'name')
+      const outEdges = _.sortBy(g.outEdges('a') ?? [], 'name')
       expect(outEdges).toHaveSize(2)
 
       const barDummy = g.node(outEdges[0].w)

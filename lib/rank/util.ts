@@ -33,7 +33,7 @@ export function longestPath(g: Graph) {
     visited[v] = true
 
     let rank = _.min(
-      _.map(g.outEdges(v), function (e) {
+      _.map(g.outEdges(v) ?? [], function (e) {
         return dfs(e.w) - g.edge(e).minlen
       })
     )

@@ -42,7 +42,7 @@ function twoLayerCrossCount(
   const southEntries = _.flatten(
     _.map(northLayer, function (v) {
       return _.sortBy(
-        _.map(g.outEdges(v), function (e) {
+        _.map(g.outEdges(v) ?? [], function (e) {
           return { pos: southPos[e.w], weight: g.edge(e).weight }
         }),
         'pos'

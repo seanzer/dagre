@@ -78,7 +78,7 @@ function removeNode(
   const results: Node[] = []
 
   if (entry.value) {
-    _.forEach(g.inEdges(entry.value.v), function (edge) {
+    _.forEach(g.inEdges(entry.value.v) ?? [], function (edge) {
       const weight = g.edge(edge)
       const uEntry = g.node(edge.v)
 
@@ -90,7 +90,7 @@ function removeNode(
       assignBucket(buckets, zeroIdx, uEntry)
     })
 
-    _.forEach(g.outEdges(entry.value.v), function (edge) {
+    _.forEach(g.outEdges(entry.value.v) ?? [], function (edge) {
       const weight = g.edge(edge)
       const w = edge.w
       const wEntry = g.node(w)

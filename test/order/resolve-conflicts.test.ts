@@ -3,7 +3,7 @@ import { Graph } from 'graphlib'
 import { resolveConflicts } from '../../lib/order/resolve-conflicts'
 
 describe('order/resolveConflicts', function () {
-  let cg
+  let cg: Graph
 
   beforeEach(function () {
     cg = new Graph()

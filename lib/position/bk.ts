@@ -43,7 +43,7 @@ export function findType1Conflicts(g: Graph, layering: string[][]) {
 
       if (w || v === lastNode) {
         _.forEach(layer.slice(scanPos, i + 1), function (scanNode) {
-          _.forEach(g.predecessors(scanNode), function (u) {
+          _.forEach(g.predecessors(scanNode) ?? [], function (u) {
             const uLabel = g.node(u)
             const uPos = uLabel.order
             if (
@@ -80,7 +80,7 @@ export function findType2Conflicts(g: Graph, layering: string[][]) {
     _.forEach(_.range(southPos, southEnd), function (i) {
       v = south[i]
       if (g.node(v).dummy) {
-        _.forEach(g.predecessors(v), function (u) {
+        _.forEach(g.predecessors(v) ?? [], function (u) {
           const uNode = g.node(u)
           if (
             uNode.dummy &&
@@ -120,7 +120,7 @@ export function findType2Conflicts(g: Graph, layering: string[][]) {
 
 function findOtherInnerSegmentNode(g: Graph, v: string) {
   if (g.node(v).dummy) {
-    return _.find(g.predecessors(v), function (u) {
+    return _.find(g.predecessors(v) ?? [], function (u) {
       return g.node(u).dummy
     }) as string
   }

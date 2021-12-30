@@ -5,6 +5,10 @@ import { buildLayerGraph } from '../../lib/order/build-layer-graph'
 describe('order/buildLayerGraph', function () {
   let g: Graph
 
+  function getGraphLabel(g: Graph) {
+    return g.graph() as unknown as { root: string }
+  }
+
   beforeEach(function () {
     g = new Graph({ compound: true, multigraph: true })
   })
@@ -16,9 +20,9 @@ describe('order/buildLayerGraph', function () {
     g.setNode('d', { rank: 3 })
 
     const lg = buildLayerGraph(g, 1, 'inEdges')
-    expect(lg.hasNode(lg.graph().root))
-    expect(lg.children()).toEqual([lg.graph().root])
-    expect(lg.children(lg.graph().root)).toEqual(['a', 'b'])
+    expect(lg.hasNode(getGraphLabel(lg).root))
+    expect(lg.children()).toEqual([getGraphLabel(lg).root])
+    expect(lg.children(getGraphLabel(lg).root)).toEqual(['a', 'b'])
   })
 
   it('copies flat nodes from the layer to the graph', function () {
@@ -123,7 +127,7 @@ describe('order/buildLayerGraph', function () {
     })
 
     const lg = buildLayerGraph(g, 0, 'inEdges')
-    const root = lg.graph().root
+    const root = getGraphLabel(lg).root
     expect(_.sortBy(lg.children(root))).toEqual(['c', 'sg'])
     expect(lg.parent('a')).toEqual('sg')
     expect(lg.parent('b')).toEqual('sg')

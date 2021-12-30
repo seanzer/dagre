@@ -60,7 +60,7 @@ export function asNonCompoundGraph(g: Graph) {
 export function successorWeights(g: Graph) {
   const weightMap = _.map(g.nodes(), function (v) {
     const sucs: { [key: string]: number } = {}
-    _.forEach(g.outEdges(v), function (e: Edge) {
+    _.forEach(g.outEdges(v) ?? [], function (e: Edge) {
       sucs[e.w] = (sucs[e.w] || 0) + g.edge(e).weight
     })
     return sucs
